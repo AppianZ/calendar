@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="screen-orientation" content="portrait">
+    <title>横屏滑动</title>
+    <link rel="stylesheet" href="calendar.css">
+</head>
+<body>
+<div id="container">
+    <div id="box">
+        <div class="item item0" style="background: #85D64D">
+        </div>
+        <div class="item item1" style="background: #abcdef">
+        </div>
+        <div class="item item2" style="background: #FF8877">
+        </div>
+        <div class="item item0" style="background: #85D64D">
+        </div>
+        <div class="item item1" style="background: #abcdef">
+        </div>
+    </div>
+    <div id="targetContainer">
+
+    </div>
+</div>
+<script src="calendar.js"></script>
+<script>
+    new Calendar({
+        container : 'targetContainer',
+        beginTime : [],
+        endTime : [],
+        recentTime : [],
+        isSundayFirst : false, // 周日是否要放在第一列
+        isShowNeighbor: true, // 是否展示相邻月份的月尾和月头
+        isToggleBtn: false, // 是否展示左右切换按钮
+        monthType: 0, // 0:1月, 1:一月, 2:Jan, 3: April
+        beforeRender: function(){
+
+        },
+        success: function(arr){
+            alert(arr);
+            console.log(arr);
+        },
+        toggleRender: function () {
+
+        }
+    });
+</script>
+</body>
+</html>
