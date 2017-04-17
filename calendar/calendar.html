@@ -10,33 +10,38 @@
 </head>
 <body>
 <div id="container">
-    <div id="box">
-        <div class="item item0" style="background: #85D64D">
-        </div>
-        <div class="item item1" style="background: #abcdef">
-        </div>
-        <div class="item item2" style="background: #FF8877">
-        </div>
-        <div class="item item0" style="background: #85D64D">
-        </div>
-        <div class="item item1" style="background: #abcdef">
-        </div>
-    </div>
     <div id="targetContainer">
-
+        <div id="" class="calendar-title">
+            <span id="container-calendar-title-left" class="calendar-title-left">&#xe64f;</span>
+            <span id="container-calendar-title-right" class="calendar-title-right">&#xe64e;</span>
+            <b class="calendar-title-center"></b>
+        </div>
+        <div id="box" class="calendar-box">
+            <div class="calendar-item calendar-item0">
+            </div>
+            <div class="calendar-item calendar-item1">
+            </div>
+            <div class="calendar-item calendar-item2">
+            </div>
+            <div class="calendar-item calendar-item0">
+            </div>
+            <div class="calendar-item calendar-item1">
+            </div>
+        </div>
     </div>
 </div>
 <script src="calendar.js"></script>
 <script>
     new Calendar({
-        container : 'targetContainer',
+        container : 'container',
         beginTime : [],
         endTime : [],
         recentTime : [],
-        isSundayFirst : false, // 周日是否要放在第一列
+        isSundayFirst : true, // 周日是否要放在第一列
         isShowNeighbor: true, // 是否展示相邻月份的月尾和月头
         isToggleBtn: false, // 是否展示左右切换按钮
-        monthType: 0, // 0:1月, 1:一月, 2:Jan, 3: April
+        isChinese: true, // 是否是中文
+        monthType: 1, // 0:1月, 1:一月, 2:Jan, 3: April
         beforeRender: function(){
 
         },
