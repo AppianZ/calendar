@@ -25,19 +25,19 @@
 	}
 	
 	function Calendar(config) {
-		this.container      = config.container;
-		this.beginTime      = config.beginTime;
-		this.endTime        = config.endTime;
-		this.recentTime     = config.recentTime;
-		this.isSundayFirst  = config.isSundayFirst;
-		this.isShowNeighbor = config.isShowNeighbor;
-		this.isToggleBtn    = config.isToggleBtn;
-		this.isChinese      = config.isChinese;
-		this.monthType      = config.monthType;
-		this.beforeRender   = config.beforeRender;
-		this.success        = config.success;
-		this.toggleRender   = config.toggleRender;
-		
+		this.container       = config.container;
+		this.beginTime       = config.beginTime;
+		this.endTime         = config.endTime;
+		this.recentTime      = config.recentTime;
+		this.isSundayFirst   = config.isSundayFirst;
+		this.isShowNeighbor  = config.isShowNeighbor;
+		this.isToggleBtn     = config.isToggleBtn;
+		this.isChinese       = config.isChinese;
+		this.monthType       = config.monthType;
+		this.canViewDisabled = config.canViewDisabled;
+		this.beforeRender    = config.beforeRender;
+		this.success         = config.success;
+		this.toggleRender    = config.toggleRender;
 		
 		this.box          = document.getElementById('box');
 		this.item1        = document.querySelectorAll('.calendar-item.calendar-item1');
@@ -49,6 +49,10 @@
 		
 		this.width    = doc.body.offsetWidth;
 		this.distance = 0;
+		
+		this.beginStamp  = 0;
+		this.endStamp    = 0;
+		this.recentStamp = 0;
 		
 		this.start = {
 			X: 0,
@@ -66,7 +70,6 @@
 			index: 0
 		};
 		
-		
 		this.initDomFuc();
 		this.initReady();
 		this.initBinding();
@@ -75,8 +78,38 @@
 	
 	Calendar.prototype = {
 		constructor: Calendar,
+		checkTime: function () {
+			var _this        = this;
+			var beginLength  = _this.beginTime.length;
+			var endLength    = _this.endTime.length;
+			var recentLength = _this.recentTime.length;
+			if (!(beginLength === 0 || beginLength === 3)) {
+				console.error('beginTime不合法 : beginTime长度为 0 或 3');
+				return false;
+			}
+			if (!(endLength === 0 || endLength === 3)) {
+				console.error('endTime不合法 : endTime长度为 0 或 3');
+				return false;
+			}
+			if (!(recentLength === 0 || recentLength === 3)) {
+				console.error('recentTime不合法 : recentLength长度为 0 或 3');
+				return false;
+			}
+			_this.beginTime   = beginLength === 3 ? _this.beginTime : [1970, 1, 1];
+			_this.endTime     = endLength === 3 ? _this.endTime : [new Date().getFullYear() + 1, 12, 31];
+			_this.recentTime  = recentLength === 3 ? _this.recentTime : [new Date().getFullYear(), new Date().getMonth() + 1, 1];
+			_this.beginStamp  = new Date(_this.beginTime[0], _this.beginTime[1] - 1, _this.beginTime[2]).getTime();
+			_this.endStamp    = new Date(_this.endTime[0], _this.endTime[1] - 1, _this.endTime[2]).getTime();
+			_this.recentStamp = new Date(_this.recentTime[0], _this.recentTime[1] - 1, _this.recentTime[2]).getTime();
+			_this.recentStamp < _this.beginStamp ? console.error('当前时间 recentTime 小于 开始时间 beginTime') : "";
+			_this.recentStamp > _this.endStamp ? console.error('当前时间 recentTime 超过 结束时间 endTime') : "";
+			return (_this.beginStamp <= _this.recentStamp && _this.recentStamp <= _this.endStamp);
+		},
 		initDomFuc: function () {
 			var _this = this;
+			if (!_this.checkTime()) return;
+			_this.currentYear = _this.recentTime[0];
+			_this.currentMonth = _this.recentTime[1] - 1;
 			this.item1.forEach(function (obj) {
 				// obj.innerHTML = _this.generateDate(_this.currentYear, _this.currentMonth - 1);
 				obj.innerHTML = _this.generateItemBodyDom(_this.currentYear, _this.currentMonth - 1);
@@ -131,7 +164,7 @@
 				_this.box.style.webkitTransform  = 'translate3d(' + _this.distance + 'px, 0 , 0)';
 				_this.box.style.transition       = 'none';
 				_this.box.style.webkitTransition = 'none';
-				_this.switchItemBody(false, _this.distance);
+				_this.switchItemBody(false, _this.distance / _this.width);
 				_this.infinitePosition();
 			});
 		},
@@ -163,15 +196,15 @@
 			var afterCount    = this.isSundayFirst ? (6 - lastInDay) : (lastInDay === 0 ? 0 : 7 - lastInDay);
 			var _this         = this;
 			loop(0, beforeCount, function (i) {
-				if (_this.isShowNeighbor) recentArr.unshift((lastDateCount - i) + 'c');
-				else recentArr.unshift('' + 'c');
+				if (_this.isShowNeighbor) recentArr.unshift((lastDateCount - i) + 'b');
+				else recentArr.unshift('' + 'b');
 			});
 			loop(1, dateCount + 1, function (i) {
 				recentArr.push(i);
 			});
 			loop(1, afterCount + 1, function (i) {
-				if (_this.isShowNeighbor) recentArr.push(i + 'c');
-				else recentArr.push('' + 'c');
+				if (_this.isShowNeighbor) recentArr.push(i + 'a');
+				else recentArr.push('' + 'a');
 			});
 			/*console.log(' =====' + year + '年 ' + month + '月=====  ');
 			 console.log(recentArr);*/
@@ -180,11 +213,16 @@
 		generateItemBodyDom: function (year, month) {
 			var dateArr = this.generateItemBodyArr(year, month);
 			var html    = this.generateItemTitle() + '<ul class="calendar-item-body">';
+			var _this = this;
 			loop(0, dateArr.length, function (i) {
-				if (/c$/.test(dateArr[i])) {
-					html += '<li class="disabled"><i>' + dateArr[i].replace('c', '') + '</i></li>';
+				if (/b$/.test(dateArr[i])) {
+					html += '<li class="disabled"><i>' + dateArr[i].replace('b', '') + '</i></li>';
+				} else if (/a$/.test(dateArr[i])) {
+					html += '<li class="disabled"><i>' + dateArr[i].replace('a', '') + '</i></li>';
 				} else {
-					html += '<li><i>' + dateArr[i] + '</i></li>';
+					html += '<li' + ((new Date(year, month, dateArr[i]).getTime() >= _this.beginStamp &&
+						new Date(year, month, dateArr[i]).getTime() <= _this.endStamp) ? '' : ' class="disabled"')
+					+ '><i>' + dateArr[i] + '</i></li>';
 				}
 			});
 			return html + '</ul>';
@@ -205,15 +243,14 @@
 				_this.distance                   = -_this.width;
 			}
 		},
-		switchItemBody: function (direct, distance ) {
-			var _this                        = this;
+		switchItemBody: function (direct, distance) {
+			var _this                                                        = this;
 			// direct: true 为左,direct:false为右。
 			_this.currentIdx                                                 = Math.abs(distance) % 3;
 			_this.currentYear                                                = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-year');
 			_this.currentMonth                                               = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-month') - 1;
 			doc.getElementsByClassName('calendar-title-center')[0].innerHTML = _this.generateTitleMonth(_this.currentYear, _this.currentMonth);
-			
-			var itemNum = direct ? ((Math.abs(distance) - 1) % 3 < 0 ? 2 : (Math.abs(distance) - 1) % 3) : (Math.abs(distance) + 1) % 3;
+			var itemNum                                                      = direct ? ((Math.abs(distance) - 1) % 3 < 0 ? 2 : (Math.abs(distance) - 1) % 3) : (Math.abs(distance) + 1) % 3;
 			
 			doc.querySelectorAll('.calendar-item.calendar-item' + itemNum).forEach(function (obj) {
 				obj.innerHTML = _this.generateItemBodyDom(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1);
