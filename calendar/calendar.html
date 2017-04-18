@@ -44,15 +44,16 @@
         isChinese: true, // 是否是中文
         monthType: 1, // 0:1月, 1:一月, 2:Jan, 3: April
         canViewDisabled: true, // 是否可以阅读不在范围内的月份
-        beforeRender: function(){
+        beforeRenderArr: [{
+            stamp: 1493827200000,
+            className: 'able1',
+        }, {
+            stamp: 1494691200000,
+            className: 'able2',
+        }],
+        success: function(item,arr){
+            console.log(item,arr);
         },
-        success: function(arr){
-            alert(arr);
-            console.log(arr);
-        },
-        toggleRender: function () {
-
-        }
     });
 </script>
 </body>
