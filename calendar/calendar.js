@@ -37,11 +37,12 @@
 		this.canViewDisabled = config.canViewDisabled;
 		this.beforeRenderArr = config.beforeRenderArr;
 		this.success         = config.success;
+		this.switchRender    = config.switchRender;
 		
-		this.box          = document.getElementById('box');
-		this.item1        = document.querySelectorAll('.calendar-item.calendar-item1');
-		this.item2        = document.querySelectorAll('.calendar-item.calendar-item2');
-		this.item0        = document.querySelectorAll('.calendar-item.calendar-item0');
+		this.box          = doc.getElementById('box');
+		this.item1        = this.box.querySelectorAll('.calendar-item.calendar-item1');
+		this.item2        = this.box.querySelectorAll('.calendar-item.calendar-item2');
+		this.item0        = this.box.querySelectorAll('.calendar-item.calendar-item0');
 		this.currentIdx   = 2;
 		this.currentYear  = new Date().getFullYear();
 		this.currentMonth = new Date().getMonth();
@@ -52,7 +53,7 @@
 		this.beginStamp  = 0;
 		this.endStamp    = 0;
 		this.recentStamp = 0;
-		this.resultArr = [];
+		this.resultArr   = [];
 		
 		this.start = {
 			X: 0,
@@ -75,7 +76,6 @@
 		this.initReady();
 		this.initBinding();
 	}
-	
 	
 	Calendar.prototype = {
 		constructor: Calendar,
@@ -127,9 +127,7 @@
 				obj.setAttribute('data-month', new Date(_this.currentYear, _this.currentMonth + 1).getMonth() + 1);
 			});
 			// 首次渲染绑定的样式
-			loop(0, _this.beforeRenderArr.length, function (k) {
-				$id(_this.container + '-item-' + _this.beforeRenderArr[k].stamp).classList.add(_this.beforeRenderArr[k].className);
-			});
+			_this.renderCallbackArr(_this.beforeRenderArr);
 		},
 		initReady: function () {
 			this.box.style.transform                                         = 'translate3d(-' + this.currentIdx * this.width + 'px, 0 , 0)';
@@ -212,9 +210,9 @@
 			return recentArr;
 		},
 		generateItemBodyDom: function (year, month) {
-			var dateArr = this.generateItemBodyArr(year, month);
-			var html    = this.generateItemTitle() + '<ul class="calendar-item-body">';
-			var _this   = this;
+			var dateArr   = this.generateItemBodyArr(year, month);
+			var html      = this.generateItemTitle() + '<ul class="calendar-item-body">';
+			var _this     = this;
 			var tempStamp = '';
 			loop(0, dateArr.length, function (i) {
 				if (/b$/.test(dateArr[i])) {
@@ -223,8 +221,8 @@
 					html += '<li class="disabled"><i>' + dateArr[i].replace('a', '') + '</i></li>';
 				} else {
 					tempStamp = new Date(year, month, dateArr[i]).getTime();
-					html += '<li' + (tempStamp>= _this.beginStamp && tempStamp <= _this.endStamp ?
-						'' : ' class="disabled"') +
+					html += '<li' + (tempStamp >= _this.beginStamp && tempStamp <= _this.endStamp ?
+							'' : ' class="disabled"') +
 						'><i data-stamp="' + tempStamp + '" id="' + _this.container + '-item-' + tempStamp + '">' + dateArr[i] + '</i></li>';
 				}
 			});
@@ -246,6 +244,16 @@
 				_this.distance                   = -_this.width;
 			}
 		},
+		renderCallbackArr: function (arr) {
+			var _this = this;
+			loop(0, arr.length, function (k)  {
+				if(!$id(_this.container + '-item-' + arr[k].stamp)) {
+					console.error(_this.container + '-item-' + arr[k].stamp + ' 不在范围内,请检查你的时间戳');
+					return true;
+				}
+				$id(_this.container + '-item-' + arr[k].stamp).classList.add(arr[k].className);
+			})
+		},
 		switchItemBody: function (direct, distance) {
 			var _this                                                        = this;
 			// direct: true 为左,direct:false为右。
@@ -254,13 +262,17 @@
 			_this.currentMonth                                               = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-month') - 1;
 			doc.getElementsByClassName('calendar-title-center')[0].innerHTML = _this.generateTitleMonth(_this.currentYear, _this.currentMonth);
 			var itemNum                                                      = direct ? ((Math.abs(distance) - 1) % 3 < 0 ? 2 : (Math.abs(distance) - 1) % 3) : (Math.abs(distance) + 1) % 3;
+			var applyYear = new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getFullYear();
+			var applyMonth =  new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getMonth();
 			
 			doc.querySelectorAll('.calendar-item.calendar-item' + itemNum).forEach(function (obj) {
 				obj.innerHTML = _this.generateItemBodyDom(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1);
-				obj.setAttribute('data-year', new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getFullYear());
-				obj.setAttribute('data-month', new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getMonth() + 1);
+				obj.setAttribute('data-year', applyYear);
+				obj.setAttribute('data-month', applyMonth + 1);
 			});
 			
+			var newMonthRenderArr = _this.switchRender(applyYear, applyMonth); // 获得回调后的数组,并执行操作
+			_this.renderCallbackArr(newMonthRenderArr);
 		},
 		touch: function (event) {
 			var event = event || window.event;
@@ -268,25 +280,25 @@
 			var _this = this;
 			switch (event.type) {
 				case "touchstart":
-					_this.start.X = event.touches[0].clientX;
+					_this.start.X    = event.touches[0].clientX;
 					_this.start.time = new Date().getTime();
 					_this.infinitePosition();
 					break;
 				case "touchend":
-					_this.end.X                      = event.changedTouches[0].clientX;
+					_this.end.X    = event.changedTouches[0].clientX;
 					_this.end.time = new Date().getTime();
-					if (_this.end.time - _this.start.time < 100) { // 如果是tap时间的话
-						if(event.target.id !== ''){
+					var tempDis    = (_this.end.X - _this.start.X).toFixed(2);
+					if (_this.end.time - _this.start.time < 150 && tempDis < 5) { // 如果是tap时间的话
+						if (event.target.matches('i') && event.target.id !== '') {
 							var dataStamp = event.target.getAttribute('data-stamp');
-							if(_this.resultArr.length === 0) {
+							if (_this.resultArr.length === 0) {
 								_this.resultArr.push(dataStamp);
-							} else if(_this.resultArr.length === 1) {
-								_this.resultArr[0] < dataStamp ? _this.resultArr.push(dataStamp): _this.resultArr[0] = dataStamp;
+							} else if (_this.resultArr.length === 1) {
+								_this.resultArr[0] < dataStamp ? _this.resultArr.push(dataStamp) : _this.resultArr[0] = dataStamp;
 							} else _this.resultArr.length = 0;
 							_this.success(dataStamp, _this.resultArr);
 						}
 					} else {
-						var tempDis                      = (_this.end.X - _this.start.X).toFixed(2);
 						var enddis                       = _this.distance + (tempDis - 0);
 						_this.box.style.transform        = 'translate3d(' + Math.round(enddis / _this.width) * _this.width + 'px, 0 , 0)';
 						_this.box.style.webkitTransform  = 'translate3d(' + Math.round(enddis / _this.width) * _this.width + 'px, 0 , 0)';

@@ -36,24 +36,28 @@
         // 用户传入实际的数据
         container : 'container',
         beginTime : [2017,4,30],//如空数组默认设置成1970年1月1日开始,数组的每一位分别是年月日。
-        endTime : [2018,3,13],//如空数组默认设置成次年12月31日,数组的每一位分别是年月日。
-        recentTime : [2017,5,2],//如空数组默认设置成当月1日,数组的每一位分别是年月日。
+        endTime : [2018,12,13],//如空数组默认设置成次年12月31日,数组的每一位分别是年月日。
+        recentTime : [2017,10,2],//如空数组默认设置成当月1日,数组的每一位分别是年月日。
         isSundayFirst : true, // 周日是否要放在第一列
         isShowNeighbor: true, // 是否展示相邻月份的月尾和月头
         isToggleBtn: false, // 是否展示左右切换按钮
         isChinese: true, // 是否是中文
         monthType: 1, // 0:1月, 1:一月, 2:Jan, 3: April
-        canViewDisabled: true, // 是否可以阅读不在范围内的月份
+        canViewDisabled: true, // 是否可以阅读不在范围内的月份 ???
         beforeRenderArr: [{
-            stamp: 1493827200000,
-            className: 'able1',
-        }, {
-            stamp: 1494691200000,
+            stamp: 1508601600000,
             className: 'able2',
         }],
         success: function(item,arr){
             console.log(item,arr);
         },
+        switchRender: function(year, month) {
+            console.log('计算机识别的 - 年份: ' + year + ' 月份: ' + month);
+            return [{
+                'stamp': 1507737600000,
+                'className': 'able1',
+            }]
+        }
     });
 </script>
 </body>
