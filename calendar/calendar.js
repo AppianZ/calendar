@@ -163,22 +163,22 @@
 				_this.touch();
 			}, true);
 			on('touchstart', _this.container + 'CalendarTitleLeft', function () {
+				_this.infinitePosition();
 				_this.distance                   = _this.distance + _this.width;
 				_this.box.style.transform        = 'translate3d(' + _this.distance + 'px, 0 , 0)';
 				_this.box.style.webkitTransform  = 'translate3d(' + _this.distance + 'px, 0 , 0)';
 				_this.box.style.transition       = 'none';
 				_this.box.style.webkitTransition = 'none';
 				_this.switchItemBody(true, _this.distance / _this.width);
-				_this.infinitePosition();
 			});
 			on('touchstart', _this.container + 'CalendarTitleRight', function () {
+				_this.infinitePosition();
 				_this.distance                   = _this.distance - _this.width;
 				_this.box.style.transform        = 'translate3d(' + _this.distance + 'px, 0 , 0)';
 				_this.box.style.webkitTransform  = 'translate3d(' + _this.distance + 'px, 0 , 0)';
 				_this.box.style.transition       = 'none';
 				_this.box.style.webkitTransition = 'none';
 				_this.switchItemBody(false, _this.distance / _this.width);
-				_this.infinitePosition();
 			});
 		},
 		checkRange: function () {
