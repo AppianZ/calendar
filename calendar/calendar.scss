@@ -15,26 +15,37 @@ body {
   url('//at.alicdn.com/t/font_a7nv1y3id33xflxr.svg#iconfont') format('svg');
 }
 
-#targetContainer {
+$titleHeight : 50px;
+$dateHeight : 40px;
+
+.calendar-block {
   width: 100%;
+  height: $dateHeight * 6 + $titleHeight;
   overflow: hidden;
+  transition: height .3s ease .5s;
+  &.shorter {
+    height: $dateHeight * 5 + $titleHeight!important;
+  }
+  &.higher {
+    height: $dateHeight * 7 + $titleHeight!important;
+  }
 }
 
 .calendar-title {
   position: relative;
   width: 100%;
-  height: 50px;
-  line-height: 50px;
+  height: $titleHeight;
+  line-height: $titleHeight;
   text-align: center;
   overflow: hidden;
   span {
     position: absolute;
     display: inline-block;
-    height: 50px;
+    height: $titleHeight;
+    line-height: $titleHeight;
     font-family: 'iconfont';
     color: #555;
     font-size: 16px;
-    line-height: 50px;
   }
   .calendar-title-left {
     left: 30px;
@@ -50,21 +61,19 @@ body {
 .calendar-box {
   position: relative;
   width: 500%;
-  height: 450px;
   .calendar-item {
     display: inline-block;
     width: 20%;
-    height: 300px;
     float: left;
     box-sizing: border-box;
     .calendar-item-title {
       width: 100%;
-      height: 40px;
+      height: $dateHeight;
       span {
         display: inline-block;
         width: 14.28%;
-        height: 40px;
-        line-height: 40px;
+        height: $dateHeight;
+        line-height: $dateHeight;
         text-align: center;
         color: #555;
         float: left;
@@ -76,8 +85,8 @@ body {
       li {
         display: inline-block;
         width: 14.28%;
-        height: 40px;
-        line-height: 40px;
+        height: $dateHeight;
+        line-height: $dateHeight;
         text-align: center;
         color: #0a0a0a;
         float: left;

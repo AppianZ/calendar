@@ -39,10 +39,7 @@
 		this.success         = config.success;
 		this.switchRender    = config.switchRender;
 		
-		this.box          = doc.getElementById('box');
-		this.item1        = this.box.querySelectorAll('.calendar-item.calendar-item1');
-		this.item2        = this.box.querySelectorAll('.calendar-item.calendar-item2');
-		this.item0        = this.box.querySelectorAll('.calendar-item.calendar-item0');
+		this.box          = null;
 		this.currentIdx   = 2;
 		this.currentYear  = new Date().getFullYear();
 		this.currentMonth = new Date().getMonth();
@@ -108,24 +105,41 @@
 		},
 		initDomFuc: function () {
 			var _this = this;
+			var html = '';
 			if (!_this.checkTime()) return;
 			_this.currentYear  = _this.recentTime[0];
 			_this.currentMonth = _this.recentTime[1] - 1;
-			this.item1.forEach(function (obj) {
-				obj.innerHTML = _this.generateItemBodyDom(_this.currentYear, _this.currentMonth - 1);
-				obj.setAttribute('data-year', new Date(_this.currentYear, _this.currentMonth - 1).getFullYear());
-				obj.setAttribute('data-month', new Date(_this.currentYear, _this.currentMonth - 1).getMonth() + 1);
-			});
-			this.item2.forEach(function (obj) {
-				obj.innerHTML = _this.generateItemBodyDom(_this.currentYear, _this.currentMonth);
-				obj.setAttribute('data-year', new Date(_this.currentYear, _this.currentMonth).getFullYear());
-				obj.setAttribute('data-month', new Date(_this.currentYear, _this.currentMonth).getMonth() + 1);
-			});
-			this.item0.forEach(function (obj) {
-				obj.innerHTML = _this.generateItemBodyDom(_this.currentYear, _this.currentMonth + 1);
-				obj.setAttribute('data-year', new Date(_this.currentYear, _this.currentMonth + 1).getFullYear());
-				obj.setAttribute('data-month', new Date(_this.currentYear, _this.currentMonth + 1).getMonth() + 1);
-			});
+			
+			html += '<div class="calendar-block">' +
+							'<div class="calendar-title">' +
+							'<span id="' + _this.container + 'CalendarTitleLeft" class="calendar-title-left">&#xe64f;</span>'+
+							'<span id="' + _this.container + 'CalendarTitleRight" class="calendar-title-right">&#xe64e;</span>' +
+							'<b id="' + _this.container + 'TitleCenter"></b></div>' +
+							' <div id="' + _this.container + 'Box" class="calendar-box">'+
+							'<div class="calendar-item calendar-item0"' +
+							' data-year="' + new Date(_this.currentYear, _this.currentMonth + 1).getFullYear() + '"' +
+							' data-month="'+ (new Date(_this.currentYear, _this.currentMonth + 1).getMonth() + 1) + '">' +
+							_this.generateItemBodyDom(_this.currentYear, _this.currentMonth + 1) + '</div>' +
+							'<div class="calendar-item calendar-item1"' +
+							' data-year="' + new Date(_this.currentYear, _this.currentMonth - 1).getFullYear() + '"' +
+							' data-month="'+ (new Date(_this.currentYear, _this.currentMonth - 1).getMonth() + 1) + '">' +
+							_this.generateItemBodyDom(_this.currentYear, _this.currentMonth - 1) + '</div>' +
+							'<div class="calendar-item calendar-item2"' +
+							' data-year="' + new Date(_this.currentYear, _this.currentMonth).getFullYear() + '"' +
+							' data-month="'+ (new Date(_this.currentYear, _this.currentMonth).getMonth() + 1) + '">' +
+							_this.generateItemBodyDom(_this.currentYear, _this.currentMonth) + '</div>' +
+							'<div class="calendar-item calendar-item0"' +
+							' data-year="' + new Date(_this.currentYear, _this.currentMonth + 1).getFullYear() + '"' +
+							' data-month="'+ (new Date(_this.currentYear, _this.currentMonth + 1).getMonth() + 1) + '">' +
+							_this.generateItemBodyDom(_this.currentYear, _this.currentMonth + 1) + '</div>' +
+							'<div class="calendar-item calendar-item1"' +
+							' data-year="' + new Date(_this.currentYear, _this.currentMonth - 1).getFullYear() + '"' +
+							' data-month="'+ (new Date(_this.currentYear, _this.currentMonth - 1).getMonth() + 1) + '">' +
+							_this.generateItemBodyDom(_this.currentYear, _this.currentMonth - 1) + '</div>' +
+							' </div></div>';
+			
+			$id(_this.container).innerHTML = html;
+			_this.box = $id(_this.container + 'Box');
 			// 首次渲染绑定的样式
 			_this.renderCallbackArr(_this.beforeRenderArr);
 		},
@@ -135,7 +149,7 @@
 			this.box.style.transitionDuration                                = '0s';
 			this.box.style.webkitTransitionDuration                          = '0s';
 			this.distance                                                    = -this.currentIdx * this.width;
-			doc.getElementsByClassName('calendar-title-center')[0].innerHTML = this.generateTitleMonth(this.currentYear, this.currentMonth);
+			$id(this.container + 'TitleCenter').innerHTML = this.generateTitleMonth(this.currentIdx,this.currentYear, this.currentMonth);
 		},
 		initBinding: function () {
 			var _this = this;
@@ -148,7 +162,7 @@
 			this.box.addEventListener('touchend', function () {
 				_this.touch();
 			}, true);
-			on('touchstart', _this.container + '-calendar-title-left', function () {
+			on('touchstart', _this.container + 'CalendarTitleLeft', function () {
 				_this.distance                   = _this.distance + _this.width;
 				_this.box.style.transform        = 'translate3d(' + _this.distance + 'px, 0 , 0)';
 				_this.box.style.webkitTransform  = 'translate3d(' + _this.distance + 'px, 0 , 0)';
@@ -157,7 +171,7 @@
 				_this.switchItemBody(true, _this.distance / _this.width);
 				_this.infinitePosition();
 			});
-			on('touchstart', _this.container + '-calendar-title-right', function () {
+			on('touchstart', _this.container + 'CalendarTitleRight', function () {
 				_this.distance                   = _this.distance - _this.width;
 				_this.box.style.transform        = 'translate3d(' + _this.distance + 'px, 0 , 0)';
 				_this.box.style.webkitTransform  = 'translate3d(' + _this.distance + 'px, 0 , 0)';
@@ -167,7 +181,18 @@
 				_this.infinitePosition();
 			});
 		},
-		generateTitleMonth: function (year, month) {
+		checkRange: function () {
+			// 用来判断生成的月份是否超过范围
+		},
+		generateTitleMonth: function (idx, year, month) {
+			var monthLiLength = this.box.querySelectorAll('.calendar-item.calendar-item' + idx)[0].querySelectorAll('li').length;
+			if(monthLiLength > 35) {
+				$id(this.container).firstChild.classList.remove('shorter');
+				$id(this.container).firstChild.classList.add('higher');
+			} else if(monthLiLength <= 28) {
+				$id(this.container).firstChild.classList.remove('higher');
+				$id(this.container).firstChild.classList.add('shorter');
+			} else $id(this.container).firstChild.classList.remove('higher', 'shorter');
 			var monthArr = [['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
 				['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
 				['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'June.', 'July.', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'],
@@ -260,12 +285,13 @@
 			_this.currentIdx                                                 = Math.abs(distance) % 3;
 			_this.currentYear                                                = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-year');
 			_this.currentMonth                                               = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-month') - 1;
-			doc.getElementsByClassName('calendar-title-center')[0].innerHTML = _this.generateTitleMonth(_this.currentYear, _this.currentMonth);
+			$id(_this.container + 'TitleCenter').innerHTML = _this.generateTitleMonth(_this.currentIdx,_this.currentYear, _this.currentMonth);
+			
 			var itemNum                                                      = direct ? ((Math.abs(distance) - 1) % 3 < 0 ? 2 : (Math.abs(distance) - 1) % 3) : (Math.abs(distance) + 1) % 3;
 			var applyYear = new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getFullYear();
 			var applyMonth =  new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getMonth();
 			
-			doc.querySelectorAll('.calendar-item.calendar-item' + itemNum).forEach(function (obj) {
+			_this.box.querySelectorAll('.calendar-item.calendar-item' + itemNum).forEach(function (obj) {
 				obj.innerHTML = _this.generateItemBodyDom(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1);
 				obj.setAttribute('data-year', applyYear);
 				obj.setAttribute('data-month', applyMonth + 1);
@@ -275,8 +301,7 @@
 			_this.renderCallbackArr(newMonthRenderArr);
 		},
 		touch: function (event) {
-			var event = event || window.event;
-			event.preventDefault();
+			event = event || window.event;
 			var _this = this;
 			switch (event.type) {
 				case "touchstart":
@@ -291,19 +316,20 @@
 					if (_this.end.time - _this.start.time < 150 && tempDis < 5) { // 如果是tap时间的话
 						if (event.target.matches('i') && event.target.id !== '') {
 							var dataStamp = event.target.getAttribute('data-stamp');
-							if (_this.resultArr.length === 0) {
+							if (_this.resultArr.length === 0) _this.resultArr.push(dataStamp);
+							else if (_this.resultArr.length === 1) _this.resultArr[0] < dataStamp ? _this.resultArr.push(dataStamp) : _this.resultArr.unshift(dataStamp);
+							else {
+								_this.resultArr.length = 0;
 								_this.resultArr.push(dataStamp);
-							} else if (_this.resultArr.length === 1) {
-								_this.resultArr[0] < dataStamp ? _this.resultArr.push(dataStamp) : _this.resultArr[0] = dataStamp;
-							} else _this.resultArr.length = 0;
+							}
 							_this.success(dataStamp, _this.resultArr);
 						}
 					} else {
 						var enddis                       = _this.distance + (tempDis - 0);
 						_this.box.style.transform        = 'translate3d(' + Math.round(enddis / _this.width) * _this.width + 'px, 0 , 0)';
 						_this.box.style.webkitTransform  = 'translate3d(' + Math.round(enddis / _this.width) * _this.width + 'px, 0 , 0)';
-						_this.box.style.transition       = 'all .5s ease-out';
-						_this.box.style.webkitTransition = 'all .5s ease-out';
+						_this.box.style.transition       = 'transform .5s ease-out';
+						_this.box.style.webkitTransition = 'transform .5s ease-out';
 						if (_this.distance !== Math.round(enddis / _this.width) * _this.width) { // 确实滑动了
 							_this.switchItemBody(tempDis > 0, Math.round(enddis / _this.width));
 						}
@@ -311,7 +337,6 @@
 					}
 					break;
 				case "touchmove":
-					event.preventDefault();
 					_this.move.X                     = event.touches[0].clientX;
 					var offset                       = (_this.move.X - _this.start.X).toFixed(2);
 					var movedis                      = _this.distance + (offset - 0);
