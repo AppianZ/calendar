@@ -76,33 +76,6 @@
 	
 	Calendar.prototype = {
 		constructor: Calendar,
-		checkTime: function () {
-			var _this        = this;
-			var beginLength  = _this.beginTime.length;
-			var endLength    = _this.endTime.length;
-			var recentLength = _this.recentTime.length;
-			if (!(beginLength === 0 || beginLength === 3)) {
-				console.error('beginTime不合法 : beginTime长度为 0 或 3');
-				return false;
-			}
-			if (!(endLength === 0 || endLength === 3)) {
-				console.error('endTime不合法 : endTime长度为 0 或 3');
-				return false;
-			}
-			if (!(recentLength === 0 || recentLength === 3)) {
-				console.error('recentTime不合法 : recentLength长度为 0 或 3');
-				return false;
-			}
-			_this.beginTime   = beginLength === 3 ? _this.beginTime : [1970, 1, 1];
-			_this.endTime     = endLength === 3 ? _this.endTime : [new Date().getFullYear() + 1, 12, 31];
-			_this.recentTime  = recentLength === 3 ? _this.recentTime : [new Date().getFullYear(), new Date().getMonth() + 1, 1];
-			_this.beginStamp  = new Date(_this.beginTime[0], _this.beginTime[1] - 1, _this.beginTime[2]).getTime();
-			_this.endStamp    = new Date(_this.endTime[0], _this.endTime[1] - 1, _this.endTime[2]).getTime();
-			_this.recentStamp = new Date(_this.recentTime[0], _this.recentTime[1] - 1, _this.recentTime[2]).getTime();
-			_this.recentStamp < _this.beginStamp ? console.error('当前时间 recentTime 小于 开始时间 beginTime') : "";
-			_this.recentStamp > _this.endStamp ? console.error('当前时间 recentTime 超过 结束时间 endTime') : "";
-			return (_this.beginStamp <= _this.recentStamp && _this.recentStamp <= _this.endStamp);
-		},
 		initDomFuc: function () {
 			var _this = this;
 			var html = '';
@@ -181,8 +154,37 @@
 				_this.switchItemBody(false, _this.distance / _this.width);
 			});
 		},
+		checkTime: function () {
+			var _this        = this;
+			var beginLength  = _this.beginTime.length;
+			var endLength    = _this.endTime.length;
+			var recentLength = _this.recentTime.length;
+			if (!(beginLength === 0 || beginLength === 3)) {
+				console.error('beginTime不合法 : beginTime长度为 0 或 3');
+				return false;
+			}
+			if (!(endLength === 0 || endLength === 3)) {
+				console.error('endTime不合法 : endTime长度为 0 或 3');
+				return false;
+			}
+			if (!(recentLength === 0 || recentLength === 3)) {
+				console.error('recentTime不合法 : recentLength长度为 0 或 3');
+				return false;
+			}
+			_this.beginTime   = beginLength === 3 ? _this.beginTime : [1970, 1, 1];
+			_this.endTime     = endLength === 3 ? _this.endTime : [new Date().getFullYear() + 1, 12, 31];
+			_this.recentTime  = recentLength === 3 ? _this.recentTime : [new Date().getFullYear(), new Date().getMonth() + 1, 1];
+			_this.beginStamp  = new Date(_this.beginTime[0], _this.beginTime[1] - 1, _this.beginTime[2]).getTime();
+			_this.endStamp    = new Date(_this.endTime[0], _this.endTime[1] - 1, _this.endTime[2]).getTime();
+			_this.recentStamp = new Date(_this.recentTime[0], _this.recentTime[1] - 1, _this.recentTime[2]).getTime();
+			_this.recentStamp < _this.beginStamp ? console.error('当前时间 recentTime 小于 开始时间 beginTime') : "";
+			_this.recentStamp > _this.endStamp ? console.error('当前时间 recentTime 超过 结束时间 endTime') : "";
+			return (_this.beginStamp <= _this.recentStamp && _this.recentStamp <= _this.endStamp);
+		},
 		checkRange: function () {
 			// 用来判断生成的月份是否超过范围
+			var _this = this;
+			
 		},
 		generateTitleMonth: function (idx, year, month) {
 			var monthLiLength = this.box.querySelectorAll('.calendar-item.calendar-item' + idx)[0].querySelectorAll('li').length;
