@@ -32,9 +32,224 @@
 	}
 	
 	function checkTime(cal) {
-		
+		var beginLength  = cal.beginTime.length;
+		var endLength    = cal.endTime.length;
+		var recentLength = cal.recentTime.length;
+		if (!(beginLength === 0 || beginLength === 3)) {
+			console.error('beginTime不合法 : beginTime长度为 0 或 3');
+			return false;
+		}
+		if (!(endLength === 0 || endLength === 3)) {
+			console.error('endTime不合法 : endTime长度为 0 或 3');
+			return false;
+		}
+		if (!(recentLength === 0 || recentLength === 3)) {
+			console.error('recentTime不合法 : recentLength长度为 0 或 3');
+			return false;
+		}
+		cal.beginTime   = beginLength === 3 ? cal.beginTime : [1970, 1, 1];
+		cal.endTime     = endLength === 3 ? cal.endTime : [new Date().getFullYear() + 1, 12, 31];
+		cal.recentTime  = recentLength === 3 ? cal.recentTime : [new Date().getFullYear(), new Date().getMonth() + 1, 1];
+		cal.beginStamp  = new Date(cal.beginTime[0], cal.beginTime[1] - 1, cal.beginTime[2]).getTime();
+		cal.endStamp    = new Date(cal.endTime[0], cal.endTime[1] - 1, cal.endTime[2]).getTime();
+		cal.recentStamp = new Date(cal.recentTime[0], cal.recentTime[1] - 1, cal.recentTime[2]).getTime();
+		cal.recentStamp < cal.beginStamp ? console.error('当前时间 recentTime 小于 开始时间 beginTime') : "";
+		cal.recentStamp > cal.endStamp ? console.error('当前时间 recentTime 超过 结束时间 endTime') : "";
+		return (cal.beginStamp <= cal.recentStamp && cal.recentStamp <= cal.endStamp);
 	}
 	
+	function checkRange(year, month, cal) {
+		// 用来判断生成的月份是否超过范围
+		$id(cal.container + 'CalendarTitleLeft').style.display  = 'inline-block';
+		$id(cal.container + 'CalendarTitleRight').style.display = 'inline-block';
+		if (new Date(year, month).getTime() >= new Date(cal.endTime[0], cal.endTime[1] - 1).getTime())
+			$id(cal.container + 'CalendarTitleRight').style.display = 'none';
+		if (new Date(year, month).getTime() <= new Date(cal.beginTime[0], cal.beginTime[1] - 1).getTime())
+			$id(cal.container + 'CalendarTitleLeft').style.display = 'none';
+	}
+	
+	function generateTitleMonth(idx, year, month, cal) {
+		var monthLiLength = cal.box.querySelectorAll('.calendar-item.calendar-item' + idx)[0].querySelectorAll('li').length;
+		if (monthLiLength > 35) {
+			$id(cal.container).firstChild.classList.remove('shorter');
+			$id(cal.container).firstChild.classList.add('higher');
+		} else if (monthLiLength <= 28) {
+			$id(cal.container).firstChild.classList.remove('higher');
+			$id(cal.container).firstChild.classList.add('shorter');
+		} else $id(cal.container).firstChild.classList.remove('higher', 'shorter');
+		var monthArr = [['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+			['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+			['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'June.', 'July.', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'],
+			['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']];
+		return monthArr[cal.monthType][new Date(year, month).getMonth()]
+			+ ' ' + new Date(year, month).getFullYear();
+	}
+	
+	function generateItemTitle(cal) {
+		var chinese       = '<span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>';
+		var english       = '<span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>';
+		var chineseString = cal.isSundayFirst ? ('<span>日</span>' + chinese) : (chinese + '<span>日</span>');
+		var englishString = cal.isSundayFirst ? ('<span>S</span>' + english) : (english + '<span>S</span>');
+		return cal.isChinese ?
+		'<div class="calendar-item-title">' + chineseString + '</div>' :
+		'<div class="calendar-item-title">' + englishString + '</div>';
+	}
+	
+	function generateItemBodyArr(year, month, cal) {
+		// 传入计算机识别的年份和月份
+		var recentArr     = [];
+		var dateCount     = new Date(year, month + 1, 0).getDate();
+		var lastDateCount = new Date(year, month, 0).getDate();
+		var firstInDay    = new Date(year, month, 1).getDay();
+		var lastInDay     = new Date(year, month + 1, 0).getDay();
+		var beforeCount   = this.isSundayFirst ? firstInDay : (firstInDay === 0 ? 6 : firstInDay - 1);
+		var afterCount    = this.isSundayFirst ? (6 - lastInDay) : (lastInDay === 0 ? 0 : 7 - lastInDay);
+		loop(0, beforeCount, function (i) {
+			if (cal.isShowNeighbor) recentArr.unshift((lastDateCount - i) + 'b');
+			else recentArr.unshift('' + 'b');
+		});
+		loop(1, dateCount + 1, function (i) {
+			recentArr.push(i);
+		});
+		loop(1, afterCount + 1, function (i) {
+			if (cal.isShowNeighbor) recentArr.push(i + 'a');
+			else recentArr.push('' + 'a');
+		});
+		/*console.log(' =====' + year + '年 ' + month + '月=====  ');
+		 console.log(recentArr);*/
+		return recentArr;
+	}
+	
+	function generateItemBodyDom(year, month, cal) {
+		var dateArr   = generateItemBodyArr(year, month, cal);
+		var html      = generateItemTitle(cal) + '<ul class="calendar-item-body">';
+		var tempStamp = '';
+		loop(0, dateArr.length, function (i) {
+			if (/b$/.test(dateArr[i])) {
+				html += '<li class="disabled"><i>' + dateArr[i].replace('b', '') + '</i></li>';
+			} else if (/a$/.test(dateArr[i])) {
+				html += '<li class="disabled"><i>' + dateArr[i].replace('a', '') + '</i></li>';
+			} else {
+				tempStamp = new Date(year, month, dateArr[i]).getTime();
+				html += '<li' + (tempStamp >= cal.beginStamp && tempStamp <= cal.endStamp ?
+						'' : ' class="disabled"') +
+					'><i data-stamp="' + tempStamp + '" id="' + cal.container + '-item-' + tempStamp + '">' + dateArr[i] + '</i></li>';
+			}
+		});
+		return html + '</ul>';
+	}
+	
+	function infinitePosition(cal) {
+		if (cal.distance == 0) {
+			transformFormat(cal.box, (-3) * cal.width);
+			cal.distance = -3 * cal.width;
+		} else if (cal.distance == -4 * cal.width) {
+			transformFormat(cal.box, (-1) * cal.width);
+			cal.distance = -cal.width;
+		}
+	}
+	
+	function renderCallbackArr(arr, cal) {
+		loop(0, arr.length, function (k) {
+			if (!$id(cal.container + '-item-' + arr[k].stamp)) {
+				console.error(cal.container + '-item-' + arr[k].stamp + ' 不在范围内,请检查你的时间戳');
+				return true;
+			}
+			$id(cal.container + '-item-' + arr[k].stamp).classList.add(arr[k].className);
+		})
+	}
+	
+	function switchItemBody(direct, distance, cal) {
+		// direct: true 为左,direct:false为右。
+		cal.currentIdx                               = Math.abs(distance) % 3;
+		cal.currentYear                              = doc.querySelectorAll('.calendar-item.calendar-item' + cal.currentIdx)[0].getAttribute('data-year');
+		cal.currentMonth                             = doc.querySelectorAll('.calendar-item.calendar-item' + cal.currentIdx)[0].getAttribute('data-month') - 1;
+		$id(cal.container + 'TitleCenter').innerHTML = generateTitleMonth(cal.currentIdx, cal.currentYear, cal.currentMonth,cal);
+		
+		var itemNum    = direct ? ((Math.abs(distance) - 1) % 3 < 0 ? 2 : (Math.abs(distance) - 1) % 3) : (Math.abs(distance) + 1) % 3;
+		var applyYear  = new Date(cal.currentYear, direct ? cal.currentMonth - 1 : cal.currentMonth + 1).getFullYear();
+		var applyMonth = new Date(cal.currentYear, direct ? cal.currentMonth - 1 : cal.currentMonth + 1).getMonth();
+		
+		cal.box.querySelectorAll('.calendar-item.calendar-item' + itemNum).forEach(function (obj) {
+			obj.innerHTML = generateItemBodyDom(cal.currentYear, direct ? cal.currentMonth - 1 : cal.currentMonth + 1, cal);
+			obj.setAttribute('data-year', applyYear);
+			obj.setAttribute('data-month', applyMonth + 1);
+		});
+		
+		var newMonthRenderArr = cal.switchRender(applyYear, applyMonth); // 获得回调后的数组,并执行操作
+		renderCallbackArr(newMonthRenderArr, cal);
+	}
+	
+	function touchStart(event, cal) {
+		cal.start.X    = event.touches[0].clientX;
+		cal.start.time = new Date().getTime();
+		infinitePosition(cal);
+	}
+	
+	function touchMove(event, cal) {
+		cal.move.X = event.touches[0].clientX;
+		var offset   = (cal.move.X - cal.start.X).toFixed(2);
+		if (offset < 0 && new Date(cal.currentYear, cal.currentMonth + 1).getTime() >= new Date(cal.endTime[0], cal.endTime[1]).getTime()) {
+			// 右滑到了临界点,
+			cal.isRangeChecked                                      = true;
+			$id(cal.container + 'CalendarTitleRight').style.display = 'none';
+		} else if (offset > 0 && new Date(cal.currentYear, cal.currentMonth - 1).getTime() <= new Date(cal.beginTime[0], cal.beginTime[1] - 2).getTime()) {
+			// 左滑到了零界点
+			cal.isRangeChecked                                     = true;
+			$id(cal.container + 'CalendarTitleLeft').style.display = 'none';
+		} else {
+			cal.isRangeChecked             = false;
+			var movedis                      = cal.distance + (offset - 0);
+			transformFormat(cal.box, movedis);
+		}
+	}
+	
+	function touchEnd(event, cal) {
+		cal.end.X = event.changedTouches[0].clientX;
+		cal.end.time = new Date().getTime();
+		var tempDis    = (cal.end.X - cal.start.X).toFixed(2);
+		if (cal.end.time - cal.start.time < 150 && tempDis < 5) { // 如果是tap时间的话
+			if (event.target.matches('i') && event.target.id !== '') {
+				var dataStamp = event.target.getAttribute('data-stamp');
+				if (cal.resultArr.length === 0) cal.resultArr.push(dataStamp);
+				else if (cal.resultArr.length === 1) cal.resultArr[0] < dataStamp ? cal.resultArr.push(dataStamp) : cal.resultArr.unshift(dataStamp);
+				else {
+					cal.resultArr.length = 0;
+					cal.resultArr.push(dataStamp);
+				}
+				cal.success(dataStamp, cal.resultArr);
+			}
+			transformFormat(cal.box,  cal.distance, 0.5);
+		} else if (!cal.isRangeChecked) {
+			var enddis = cal.distance + (tempDis - 0);
+			if (cal.end.X * 2 >= cal.width && tempDis * 3 >= cal.width) {
+				enddis = Math.ceil(enddis / cal.width);
+			} else {
+				enddis = Math.floor(enddis / cal.width);
+			}
+			transformFormat(cal.box, enddis * cal.width, 0.5);
+			if (cal.distance !== enddis * cal.width) { // 确实滑动了
+				switchItemBody(tempDis > 0, enddis, cal);
+			}
+			cal.distance = enddis * cal.width;
+			checkRange(cal.currentYear, cal.currentMonth, cal);
+		}
+	}
+	
+	function touch(event, cal) {
+		event     = event || window.event;
+		switch (event.type) {
+			case "touchstart":
+				touchStart(event, cal);
+				break;
+			case "touchend":
+				touchEnd(event, cal);
+				break;
+			case "touchmove":
+				touchMove(event, cal);
+				break;
+		}
+	}
 	
 	function Calendar(config) {
 		this.container       = config.container;
@@ -68,17 +283,15 @@
 		this.start = {
 			X: 0,
 			Y: 0,
-			time: ''
+			time: 0
 		};
 		this.move  = {
 			X: 0,
 			Y: 0,
-			speed: []
 		};
 		this.end   = {
 			X: 0,
 			Y: 0,
-			index: 0,
 			time: 0
 		};
 		
@@ -87,13 +300,12 @@
 		this.initBinding();
 	}
 	
-	
 	Calendar.prototype = {
 		constructor: Calendar,
 		initDomFuc: function () {
 			var _this = this;
 			var html  = '';
-			if (!_this.checkTime()) return;
+			if (!checkTime(_this)) return;
 			_this.currentYear  = _this.recentTime[0];
 			_this.currentMonth = _this.recentTime[1] - 1;
 			
@@ -106,29 +318,28 @@
 				'<div class="calendar-item calendar-item0"' +
 				' data-year="' + new Date(_this.currentYear, _this.currentMonth + 1).getFullYear() + '"' +
 				' data-month="' + (new Date(_this.currentYear, _this.currentMonth + 1).getMonth() + 1) + '">' +
-				_this.generateItemBodyDom(_this.currentYear, _this.currentMonth + 1) + '</div>' +
+				generateItemBodyDom(_this.currentYear, _this.currentMonth + 1, _this) + '</div>' +
 				'<div class="calendar-item calendar-item1"' +
 				' data-year="' + new Date(_this.currentYear, _this.currentMonth - 1).getFullYear() + '"' +
 				' data-month="' + (new Date(_this.currentYear, _this.currentMonth - 1).getMonth() + 1) + '">' +
-				_this.generateItemBodyDom(_this.currentYear, _this.currentMonth - 1) + '</div>' +
+				generateItemBodyDom(_this.currentYear, _this.currentMonth - 1, _this) + '</div>' +
 				'<div class="calendar-item calendar-item2"' +
 				' data-year="' + new Date(_this.currentYear, _this.currentMonth).getFullYear() + '"' +
 				' data-month="' + (new Date(_this.currentYear, _this.currentMonth).getMonth() + 1) + '">' +
-				_this.generateItemBodyDom(_this.currentYear, _this.currentMonth) + '</div>' +
+				generateItemBodyDom(_this.currentYear, _this.currentMonth, _this) + '</div>' +
 				'<div class="calendar-item calendar-item0"' +
 				' data-year="' + new Date(_this.currentYear, _this.currentMonth + 1).getFullYear() + '"' +
 				' data-month="' + (new Date(_this.currentYear, _this.currentMonth + 1).getMonth() + 1) + '">' +
-				_this.generateItemBodyDom(_this.currentYear, _this.currentMonth + 1) + '</div>' +
+				generateItemBodyDom(_this.currentYear, _this.currentMonth + 1, _this) + '</div>' +
 				'<div class="calendar-item calendar-item1"' +
 				' data-year="' + new Date(_this.currentYear, _this.currentMonth - 1).getFullYear() + '"' +
 				' data-month="' + (new Date(_this.currentYear, _this.currentMonth - 1).getMonth() + 1) + '">' +
-				_this.generateItemBodyDom(_this.currentYear, _this.currentMonth - 1) + '</div>' +
+				generateItemBodyDom(_this.currentYear, _this.currentMonth - 1,_this) + '</div>' +
 				' </div></div>';
 			
 			$id(_this.container).innerHTML = html;
 			_this.box                      = $id(_this.container + 'Box');
-			// 首次渲染绑定的样式
-			_this.renderCallbackArr(_this.beforeRenderArr);
+			renderCallbackArr(_this.beforeRenderArr, _this);
 		},
 		initReady: function () {
 			this.box.style.transform                      = 'translate3d(-' + this.currentIdx * this.width + 'px, 0 , 0)';
@@ -136,246 +347,35 @@
 			this.box.style.transitionDuration             = '0s';
 			this.box.style.webkitTransitionDuration       = '0s';
 			this.distance                                 = -this.currentIdx * this.width;
-			$id(this.container + 'TitleCenter').innerHTML = this.generateTitleMonth(this.currentIdx, this.currentYear, this.currentMonth);
-			this.checkRange(this.currentYear, this.currentMonth);
+			$id(this.container + 'TitleCenter').innerHTML = generateTitleMonth(this.currentIdx, this.currentYear, this.currentMonth, this);
+			checkRange(this.currentYear, this.currentMonth, this);
 		},
 		initBinding: function () {
 			var _this = this;
-			this.box.addEventListener('touchstart', function () {
-				_this.touch();
+			this.box.addEventListener('touchstart', function (e) {
+				touch(e, _this);
 			}, false);
-			this.box.addEventListener('touchmove', function () {
-				_this.touch();
+			this.box.addEventListener('touchmove', function (e) {
+				touch(e, _this);
 			}, false);
-			this.box.addEventListener('touchend', function () {
-				_this.touch();
+			this.box.addEventListener('touchend', function (e) {
+				touch(e, _this);
 			}, true);
 			on('touchstart', _this.container + 'CalendarTitleLeft', function () {
-				_this.infinitePosition();
+				infinitePosition(_this);
 				_this.distance = _this.distance + _this.width;
 				transformFormat(_this.box, _this.distance);
-				_this.switchItemBody(true, _this.distance / _this.width);
-				_this.checkRange(_this.currentYear, _this.currentMonth);
+				switchItemBody(true, _this.distance / _this.width, _this);
+				checkRange(_this.currentYear, _this.currentMonth, _this);
 			});
 			on('touchstart', _this.container + 'CalendarTitleRight', function () {
-				_this.infinitePosition();
+				infinitePosition(_this);
 				_this.distance = _this.distance - _this.width;
 				transformFormat(_this.box, _this.distance);
-				_this.switchItemBody(false, _this.distance / _this.width);
-				_this.checkRange(false, _this.currentYear, _this.currentMonth);
-				_this.checkRange(_this.currentYear, _this.currentMonth);
+				switchItemBody(false, _this.distance / _this.width, _this);
+				checkRange(_this.currentYear, _this.currentMonth, _this);
 			});
 		},
-		checkTime: function () {
-			var _this        = this;
-			var beginLength  = _this.beginTime.length;
-			var endLength    = _this.endTime.length;
-			var recentLength = _this.recentTime.length;
-			if (!(beginLength === 0 || beginLength === 3)) {
-				console.error('beginTime不合法 : beginTime长度为 0 或 3');
-				return false;
-			}
-			if (!(endLength === 0 || endLength === 3)) {
-				console.error('endTime不合法 : endTime长度为 0 或 3');
-				return false;
-			}
-			if (!(recentLength === 0 || recentLength === 3)) {
-				console.error('recentTime不合法 : recentLength长度为 0 或 3');
-				return false;
-			}
-			_this.beginTime   = beginLength === 3 ? _this.beginTime : [1970, 1, 1];
-			_this.endTime     = endLength === 3 ? _this.endTime : [new Date().getFullYear() + 1, 12, 31];
-			_this.recentTime  = recentLength === 3 ? _this.recentTime : [new Date().getFullYear(), new Date().getMonth() + 1, 1];
-			_this.beginStamp  = new Date(_this.beginTime[0], _this.beginTime[1] - 1, _this.beginTime[2]).getTime();
-			_this.endStamp    = new Date(_this.endTime[0], _this.endTime[1] - 1, _this.endTime[2]).getTime();
-			_this.recentStamp = new Date(_this.recentTime[0], _this.recentTime[1] - 1, _this.recentTime[2]).getTime();
-			_this.recentStamp < _this.beginStamp ? console.error('当前时间 recentTime 小于 开始时间 beginTime') : "";
-			_this.recentStamp > _this.endStamp ? console.error('当前时间 recentTime 超过 结束时间 endTime') : "";
-			return (_this.beginStamp <= _this.recentStamp && _this.recentStamp <= _this.endStamp);
-		},
-		checkRange: function (year, month) {
-			// 用来判断生成的月份是否超过范围
-			var _this                                                 = this;
-			$id(_this.container + 'CalendarTitleLeft').style.display  = 'inline-block';
-			$id(_this.container + 'CalendarTitleRight').style.display = 'inline-block';
-			if (new Date(year, month).getTime() >= new Date(_this.endTime[0], _this.endTime[1] - 1).getTime()) {
-				// 右滑到了临界点,
-				$id(_this.container + 'CalendarTitleRight').style.display = 'none';
-			}
-			if (new Date(year, month).getTime() <= new Date(_this.beginTime[0], _this.beginTime[1] - 1).getTime()) {
-				// 左滑到了零界点
-				$id(_this.container + 'CalendarTitleLeft').style.display = 'none';
-			}
-		},
-		generateTitleMonth: function (idx, year, month) {
-			var monthLiLength = this.box.querySelectorAll('.calendar-item.calendar-item' + idx)[0].querySelectorAll('li').length;
-			if (monthLiLength > 35) {
-				$id(this.container).firstChild.classList.remove('shorter');
-				$id(this.container).firstChild.classList.add('higher');
-			} else if (monthLiLength <= 28) {
-				$id(this.container).firstChild.classList.remove('higher');
-				$id(this.container).firstChild.classList.add('shorter');
-			} else $id(this.container).firstChild.classList.remove('higher', 'shorter');
-			var monthArr = [['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-				['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-				['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'June.', 'July.', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'],
-				['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augest', 'September', 'October', 'November', 'December']];
-			return monthArr[this.monthType][new Date(year, month).getMonth()]
-				+ ' ' + new Date(year, month).getFullYear();
-		},
-		generateItemTitle: function () {
-			var chinese       = '<span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>';
-			var english       = '<span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>';
-			var chineseString = this.isSundayFirst ? ('<span>日</span>' + chinese) : (chinese + '<span>日</span>');
-			var englishString = this.isSundayFirst ? ('<span>S</span>' + english) : (english + '<span>S</span>');
-			return this.isChinese ?
-			'<div class="calendar-item-title">' + chineseString + '</div>' :
-			'<div class="calendar-item-title">' + englishString + '</div>';
-		},
-		generateItemBodyArr: function (year, month) {
-			// 传入计算机识别的年份和月份
-			var recentArr     = [];
-			var dateCount     = new Date(year, month + 1, 0).getDate();
-			var lastDateCount = new Date(year, month, 0).getDate();
-			var firstInDay    = new Date(year, month, 1).getDay();
-			var lastInDay     = new Date(year, month + 1, 0).getDay();
-			var beforeCount   = this.isSundayFirst ? firstInDay : (firstInDay === 0 ? 6 : firstInDay - 1);
-			var afterCount    = this.isSundayFirst ? (6 - lastInDay) : (lastInDay === 0 ? 0 : 7 - lastInDay);
-			var _this         = this;
-			loop(0, beforeCount, function (i) {
-				if (_this.isShowNeighbor) recentArr.unshift((lastDateCount - i) + 'b');
-				else recentArr.unshift('' + 'b');
-			});
-			loop(1, dateCount + 1, function (i) {
-				recentArr.push(i);
-			});
-			loop(1, afterCount + 1, function (i) {
-				if (_this.isShowNeighbor) recentArr.push(i + 'a');
-				else recentArr.push('' + 'a');
-			});
-			/*console.log(' =====' + year + '年 ' + month + '月=====  ');
-			 console.log(recentArr);*/
-			return recentArr;
-		},
-		generateItemBodyDom: function (year, month) {
-			var dateArr   = this.generateItemBodyArr(year, month);
-			var html      = this.generateItemTitle() + '<ul class="calendar-item-body">';
-			var _this     = this;
-			var tempStamp = '';
-			loop(0, dateArr.length, function (i) {
-				if (/b$/.test(dateArr[i])) {
-					html += '<li class="disabled"><i>' + dateArr[i].replace('b', '') + '</i></li>';
-				} else if (/a$/.test(dateArr[i])) {
-					html += '<li class="disabled"><i>' + dateArr[i].replace('a', '') + '</i></li>';
-				} else {
-					tempStamp = new Date(year, month, dateArr[i]).getTime();
-					html += '<li' + (tempStamp >= _this.beginStamp && tempStamp <= _this.endStamp ?
-							'' : ' class="disabled"') +
-						'><i data-stamp="' + tempStamp + '" id="' + _this.container + '-item-' + tempStamp + '">' + dateArr[i] + '</i></li>';
-				}
-			});
-			return html + '</ul>';
-		},
-		infinitePosition: function () {
-			var _this = this;
-			if (_this.distance == 0) {
-				transformFormat(_this.box, (-3) * _this.width);
-				_this.distance = -3 * _this.width;
-			} else if (_this.distance == -4 * _this.width) {
-				transformFormat(_this.box, (-1) * _this.width);
-				_this.distance = -_this.width;
-			}
-		},
-		renderCallbackArr: function (arr) {
-			var _this = this;
-			loop(0, arr.length, function (k) {
-				if (!$id(_this.container + '-item-' + arr[k].stamp)) {
-					console.error(_this.container + '-item-' + arr[k].stamp + ' 不在范围内,请检查你的时间戳');
-					return true;
-				}
-				$id(_this.container + '-item-' + arr[k].stamp).classList.add(arr[k].className);
-			})
-		},
-		switchItemBody: function (direct, distance) {
-			var _this                                      = this;
-			// direct: true 为左,direct:false为右。
-			_this.currentIdx                               = Math.abs(distance) % 3;
-			_this.currentYear                              = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-year');
-			_this.currentMonth                             = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-month') - 1;
-			$id(_this.container + 'TitleCenter').innerHTML = _this.generateTitleMonth(_this.currentIdx, _this.currentYear, _this.currentMonth);
-			
-			var itemNum    = direct ? ((Math.abs(distance) - 1) % 3 < 0 ? 2 : (Math.abs(distance) - 1) % 3) : (Math.abs(distance) + 1) % 3;
-			var applyYear  = new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getFullYear();
-			var applyMonth = new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getMonth();
-			
-			_this.box.querySelectorAll('.calendar-item.calendar-item' + itemNum).forEach(function (obj) {
-				obj.innerHTML = _this.generateItemBodyDom(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1);
-				obj.setAttribute('data-year', applyYear);
-				obj.setAttribute('data-month', applyMonth + 1);
-			});
-			
-			var newMonthRenderArr = _this.switchRender(applyYear, applyMonth); // 获得回调后的数组,并执行操作
-			_this.renderCallbackArr(newMonthRenderArr);
-		},
-		touch: function (event) {
-			event     = event || window.event;
-			var _this = this;
-			switch (event.type) {
-				case "touchstart":
-					_this.start.X    = event.touches[0].clientX;
-					_this.start.time = new Date().getTime();
-					_this.infinitePosition();
-					break;
-				case "touchend":
-					_this.end.X = event.changedTouches[0].clientX;
-					_this.end.time = new Date().getTime();
-					var tempDis    = (_this.end.X - _this.start.X).toFixed(2);
-					if (_this.end.time - _this.start.time < 150 && tempDis < 5) { // 如果是tap时间的话
-						if (event.target.matches('i') && event.target.id !== '') {
-							var dataStamp = event.target.getAttribute('data-stamp');
-							if (_this.resultArr.length === 0) _this.resultArr.push(dataStamp);
-							else if (_this.resultArr.length === 1) _this.resultArr[0] < dataStamp ? _this.resultArr.push(dataStamp) : _this.resultArr.unshift(dataStamp);
-							else {
-								_this.resultArr.length = 0;
-								_this.resultArr.push(dataStamp);
-							}
-							_this.success(dataStamp, _this.resultArr);
-						}
-						transformFormat(_this.box,  _this.distance, 0.5);
-					} else if (!_this.isRangeChecked) {
-						var enddis = _this.distance + (tempDis - 0);
-						if (_this.end.X * 2 >= _this.width && tempDis * 3 >= _this.width) {
-							enddis = Math.ceil(enddis / _this.width);
-						} else {
-							enddis = Math.floor(enddis / _this.width);
-						}
-						transformFormat(_this.box, enddis * _this.width, 0.5);
-						if (_this.distance !== enddis * _this.width) { // 确实滑动了
-							_this.switchItemBody(tempDis > 0, enddis);
-						}
-						_this.distance = enddis * _this.width;
-						_this.checkRange(_this.currentYear, _this.currentMonth);
-					}
-					break;
-				case "touchmove":
-					_this.move.X = event.touches[0].clientX;
-					var offset   = (_this.move.X - _this.start.X).toFixed(2);
-					if (offset < 0 && new Date(_this.currentYear, _this.currentMonth + 1).getTime() >= new Date(_this.endTime[0], _this.endTime[1]).getTime()) {
-						// 右滑到了临界点,
-						_this.isRangeChecked                                      = true;
-						$id(_this.container + 'CalendarTitleRight').style.display = 'none';
-					} else if (offset > 0 && new Date(_this.currentYear, _this.currentMonth - 1).getTime() <= new Date(_this.beginTime[0], _this.beginTime[1] - 2).getTime()) {
-						// 左滑到了零界点
-						_this.isRangeChecked                                     = true;
-						$id(_this.container + 'CalendarTitleLeft').style.display = 'none';
-					} else {
-						_this.isRangeChecked             = false;
-						var movedis                      = _this.distance + (offset - 0);
-						transformFormat(_this.box, movedis);
-					}
-					break;
-			}
-		}
 	};
 	
 	if (typeof exports == "object") {
