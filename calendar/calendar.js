@@ -24,6 +24,18 @@
 		})
 	}
 	
+	function transformFormat(target, distance, time) {
+		target.style.transform        = 'translate3d(' + distance + 'px, 0 , 0)';
+		target.style.webkitTransform  = 'translate3d(' + distance + 'px, 0 , 0)';
+		target.style.transition       = time ? 'transform ' + time + 's ease' : 'none';
+		target.style.webkitTransition = time ? 'transform ' + time + 's ease' : 'none';
+	}
+	
+	function checkTime(cal) {
+		
+	}
+	
+	
 	function Calendar(config) {
 		this.container       = config.container;
 		this.beginTime       = config.beginTime;
@@ -47,10 +59,11 @@
 		this.width    = doc.body.offsetWidth;
 		this.distance = 0;
 		
-		this.beginStamp  = 0;
-		this.endStamp    = 0;
-		this.recentStamp = 0;
-		this.resultArr   = [];
+		this.beginStamp     = 0;
+		this.endStamp       = 0;
+		this.recentStamp    = 0;
+		this.isRangeChecked = false;
+		this.resultArr      = [];
 		
 		this.start = {
 			X: 0,
@@ -74,55 +87,57 @@
 		this.initBinding();
 	}
 	
+	
 	Calendar.prototype = {
 		constructor: Calendar,
 		initDomFuc: function () {
 			var _this = this;
-			var html = '';
+			var html  = '';
 			if (!_this.checkTime()) return;
 			_this.currentYear  = _this.recentTime[0];
 			_this.currentMonth = _this.recentTime[1] - 1;
 			
 			html += '<div class="calendar-block">' +
-							'<div class="calendar-title">' +
-							'<span id="' + _this.container + 'CalendarTitleLeft" class="calendar-title-left">&#xe64f;</span>'+
-							'<span id="' + _this.container + 'CalendarTitleRight" class="calendar-title-right">&#xe64e;</span>' +
-							'<b id="' + _this.container + 'TitleCenter"></b></div>' +
-							' <div id="' + _this.container + 'Box" class="calendar-box">'+
-							'<div class="calendar-item calendar-item0"' +
-							' data-year="' + new Date(_this.currentYear, _this.currentMonth + 1).getFullYear() + '"' +
-							' data-month="'+ (new Date(_this.currentYear, _this.currentMonth + 1).getMonth() + 1) + '">' +
-							_this.generateItemBodyDom(_this.currentYear, _this.currentMonth + 1) + '</div>' +
-							'<div class="calendar-item calendar-item1"' +
-							' data-year="' + new Date(_this.currentYear, _this.currentMonth - 1).getFullYear() + '"' +
-							' data-month="'+ (new Date(_this.currentYear, _this.currentMonth - 1).getMonth() + 1) + '">' +
-							_this.generateItemBodyDom(_this.currentYear, _this.currentMonth - 1) + '</div>' +
-							'<div class="calendar-item calendar-item2"' +
-							' data-year="' + new Date(_this.currentYear, _this.currentMonth).getFullYear() + '"' +
-							' data-month="'+ (new Date(_this.currentYear, _this.currentMonth).getMonth() + 1) + '">' +
-							_this.generateItemBodyDom(_this.currentYear, _this.currentMonth) + '</div>' +
-							'<div class="calendar-item calendar-item0"' +
-							' data-year="' + new Date(_this.currentYear, _this.currentMonth + 1).getFullYear() + '"' +
-							' data-month="'+ (new Date(_this.currentYear, _this.currentMonth + 1).getMonth() + 1) + '">' +
-							_this.generateItemBodyDom(_this.currentYear, _this.currentMonth + 1) + '</div>' +
-							'<div class="calendar-item calendar-item1"' +
-							' data-year="' + new Date(_this.currentYear, _this.currentMonth - 1).getFullYear() + '"' +
-							' data-month="'+ (new Date(_this.currentYear, _this.currentMonth - 1).getMonth() + 1) + '">' +
-							_this.generateItemBodyDom(_this.currentYear, _this.currentMonth - 1) + '</div>' +
-							' </div></div>';
+				'<div class="calendar-title">' +
+				'<span id="' + _this.container + 'CalendarTitleLeft" class="calendar-title-left">&#xe64f;</span>' +
+				'<span id="' + _this.container + 'CalendarTitleRight" class="calendar-title-right">&#xe64e;</span>' +
+				'<b id="' + _this.container + 'TitleCenter"></b></div>' +
+				' <div id="' + _this.container + 'Box" class="calendar-box">' +
+				'<div class="calendar-item calendar-item0"' +
+				' data-year="' + new Date(_this.currentYear, _this.currentMonth + 1).getFullYear() + '"' +
+				' data-month="' + (new Date(_this.currentYear, _this.currentMonth + 1).getMonth() + 1) + '">' +
+				_this.generateItemBodyDom(_this.currentYear, _this.currentMonth + 1) + '</div>' +
+				'<div class="calendar-item calendar-item1"' +
+				' data-year="' + new Date(_this.currentYear, _this.currentMonth - 1).getFullYear() + '"' +
+				' data-month="' + (new Date(_this.currentYear, _this.currentMonth - 1).getMonth() + 1) + '">' +
+				_this.generateItemBodyDom(_this.currentYear, _this.currentMonth - 1) + '</div>' +
+				'<div class="calendar-item calendar-item2"' +
+				' data-year="' + new Date(_this.currentYear, _this.currentMonth).getFullYear() + '"' +
+				' data-month="' + (new Date(_this.currentYear, _this.currentMonth).getMonth() + 1) + '">' +
+				_this.generateItemBodyDom(_this.currentYear, _this.currentMonth) + '</div>' +
+				'<div class="calendar-item calendar-item0"' +
+				' data-year="' + new Date(_this.currentYear, _this.currentMonth + 1).getFullYear() + '"' +
+				' data-month="' + (new Date(_this.currentYear, _this.currentMonth + 1).getMonth() + 1) + '">' +
+				_this.generateItemBodyDom(_this.currentYear, _this.currentMonth + 1) + '</div>' +
+				'<div class="calendar-item calendar-item1"' +
+				' data-year="' + new Date(_this.currentYear, _this.currentMonth - 1).getFullYear() + '"' +
+				' data-month="' + (new Date(_this.currentYear, _this.currentMonth - 1).getMonth() + 1) + '">' +
+				_this.generateItemBodyDom(_this.currentYear, _this.currentMonth - 1) + '</div>' +
+				' </div></div>';
 			
 			$id(_this.container).innerHTML = html;
-			_this.box = $id(_this.container + 'Box');
+			_this.box                      = $id(_this.container + 'Box');
 			// 首次渲染绑定的样式
 			_this.renderCallbackArr(_this.beforeRenderArr);
 		},
 		initReady: function () {
-			this.box.style.transform                                         = 'translate3d(-' + this.currentIdx * this.width + 'px, 0 , 0)';
-			this.box.style.webkitTransform                                   = 'translate3d(-' + this.currentIdx * this.width + 'px, 0 , 0)';
-			this.box.style.transitionDuration                                = '0s';
-			this.box.style.webkitTransitionDuration                          = '0s';
-			this.distance                                                    = -this.currentIdx * this.width;
-			$id(this.container + 'TitleCenter').innerHTML = this.generateTitleMonth(this.currentIdx,this.currentYear, this.currentMonth);
+			this.box.style.transform                      = 'translate3d(-' + this.currentIdx * this.width + 'px, 0 , 0)';
+			this.box.style.webkitTransform                = 'translate3d(-' + this.currentIdx * this.width + 'px, 0 , 0)';
+			this.box.style.transitionDuration             = '0s';
+			this.box.style.webkitTransitionDuration       = '0s';
+			this.distance                                 = -this.currentIdx * this.width;
+			$id(this.container + 'TitleCenter').innerHTML = this.generateTitleMonth(this.currentIdx, this.currentYear, this.currentMonth);
+			this.checkRange(this.currentYear, this.currentMonth);
 		},
 		initBinding: function () {
 			var _this = this;
@@ -137,21 +152,18 @@
 			}, true);
 			on('touchstart', _this.container + 'CalendarTitleLeft', function () {
 				_this.infinitePosition();
-				_this.distance                   = _this.distance + _this.width;
-				_this.box.style.transform        = 'translate3d(' + _this.distance + 'px, 0 , 0)';
-				_this.box.style.webkitTransform  = 'translate3d(' + _this.distance + 'px, 0 , 0)';
-				_this.box.style.transition       = 'none';
-				_this.box.style.webkitTransition = 'none';
+				_this.distance = _this.distance + _this.width;
+				transformFormat(_this.box, _this.distance);
 				_this.switchItemBody(true, _this.distance / _this.width);
+				_this.checkRange(_this.currentYear, _this.currentMonth);
 			});
 			on('touchstart', _this.container + 'CalendarTitleRight', function () {
 				_this.infinitePosition();
-				_this.distance                   = _this.distance - _this.width;
-				_this.box.style.transform        = 'translate3d(' + _this.distance + 'px, 0 , 0)';
-				_this.box.style.webkitTransform  = 'translate3d(' + _this.distance + 'px, 0 , 0)';
-				_this.box.style.transition       = 'none';
-				_this.box.style.webkitTransition = 'none';
+				_this.distance = _this.distance - _this.width;
+				transformFormat(_this.box, _this.distance);
 				_this.switchItemBody(false, _this.distance / _this.width);
+				_this.checkRange(false, _this.currentYear, _this.currentMonth);
+				_this.checkRange(_this.currentYear, _this.currentMonth);
 			});
 		},
 		checkTime: function () {
@@ -181,17 +193,26 @@
 			_this.recentStamp > _this.endStamp ? console.error('当前时间 recentTime 超过 结束时间 endTime') : "";
 			return (_this.beginStamp <= _this.recentStamp && _this.recentStamp <= _this.endStamp);
 		},
-		checkRange: function () {
+		checkRange: function (year, month) {
 			// 用来判断生成的月份是否超过范围
-			var _this = this;
-			
+			var _this                                                 = this;
+			$id(_this.container + 'CalendarTitleLeft').style.display  = 'inline-block';
+			$id(_this.container + 'CalendarTitleRight').style.display = 'inline-block';
+			if (new Date(year, month).getTime() >= new Date(_this.endTime[0], _this.endTime[1] - 1).getTime()) {
+				// 右滑到了临界点,
+				$id(_this.container + 'CalendarTitleRight').style.display = 'none';
+			}
+			if (new Date(year, month).getTime() <= new Date(_this.beginTime[0], _this.beginTime[1] - 1).getTime()) {
+				// 左滑到了零界点
+				$id(_this.container + 'CalendarTitleLeft').style.display = 'none';
+			}
 		},
 		generateTitleMonth: function (idx, year, month) {
 			var monthLiLength = this.box.querySelectorAll('.calendar-item.calendar-item' + idx)[0].querySelectorAll('li').length;
-			if(monthLiLength > 35) {
+			if (monthLiLength > 35) {
 				$id(this.container).firstChild.classList.remove('shorter');
 				$id(this.container).firstChild.classList.add('higher');
-			} else if(monthLiLength <= 28) {
+			} else if (monthLiLength <= 28) {
 				$id(this.container).firstChild.classList.remove('higher');
 				$id(this.container).firstChild.classList.add('shorter');
 			} else $id(this.container).firstChild.classList.remove('higher', 'shorter');
@@ -258,23 +279,17 @@
 		infinitePosition: function () {
 			var _this = this;
 			if (_this.distance == 0) {
-				_this.box.style.transform        = 'translate3d(-' + 3 * _this.width + 'px, 0 , 0)';
-				_this.box.style.webkitTransform  = 'translate3d(-' + 3 * _this.width + 'px, 0 , 0)';
-				_this.box.style.transition       = 'none';
-				_this.box.style.webkitTransition = 'none';
-				_this.distance                   = -3 * _this.width;
+				transformFormat(_this.box, (-3) * _this.width);
+				_this.distance = -3 * _this.width;
 			} else if (_this.distance == -4 * _this.width) {
-				_this.box.style.transform        = 'translate3d(-' + _this.width + 'px, 0 , 0)';
-				_this.box.style.webkitTransform  = 'translate3d(-' + _this.width + 'px, 0 , 0)';
-				_this.box.style.transition       = 'none';
-				_this.box.style.webkitTransition = 'none';
-				_this.distance                   = -_this.width;
+				transformFormat(_this.box, (-1) * _this.width);
+				_this.distance = -_this.width;
 			}
 		},
 		renderCallbackArr: function (arr) {
 			var _this = this;
-			loop(0, arr.length, function (k)  {
-				if(!$id(_this.container + '-item-' + arr[k].stamp)) {
+			loop(0, arr.length, function (k) {
+				if (!$id(_this.container + '-item-' + arr[k].stamp)) {
 					console.error(_this.container + '-item-' + arr[k].stamp + ' 不在范围内,请检查你的时间戳');
 					return true;
 				}
@@ -282,16 +297,16 @@
 			})
 		},
 		switchItemBody: function (direct, distance) {
-			var _this                                                        = this;
+			var _this                                      = this;
 			// direct: true 为左,direct:false为右。
-			_this.currentIdx                                                 = Math.abs(distance) % 3;
-			_this.currentYear                                                = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-year');
-			_this.currentMonth                                               = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-month') - 1;
-			$id(_this.container + 'TitleCenter').innerHTML = _this.generateTitleMonth(_this.currentIdx,_this.currentYear, _this.currentMonth);
+			_this.currentIdx                               = Math.abs(distance) % 3;
+			_this.currentYear                              = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-year');
+			_this.currentMonth                             = doc.querySelectorAll('.calendar-item.calendar-item' + _this.currentIdx)[0].getAttribute('data-month') - 1;
+			$id(_this.container + 'TitleCenter').innerHTML = _this.generateTitleMonth(_this.currentIdx, _this.currentYear, _this.currentMonth);
 			
-			var itemNum                                                      = direct ? ((Math.abs(distance) - 1) % 3 < 0 ? 2 : (Math.abs(distance) - 1) % 3) : (Math.abs(distance) + 1) % 3;
-			var applyYear = new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getFullYear();
-			var applyMonth =  new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getMonth();
+			var itemNum    = direct ? ((Math.abs(distance) - 1) % 3 < 0 ? 2 : (Math.abs(distance) - 1) % 3) : (Math.abs(distance) + 1) % 3;
+			var applyYear  = new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getFullYear();
+			var applyMonth = new Date(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1).getMonth();
 			
 			_this.box.querySelectorAll('.calendar-item.calendar-item' + itemNum).forEach(function (obj) {
 				obj.innerHTML = _this.generateItemBodyDom(_this.currentYear, direct ? _this.currentMonth - 1 : _this.currentMonth + 1);
@@ -303,7 +318,7 @@
 			_this.renderCallbackArr(newMonthRenderArr);
 		},
 		touch: function (event) {
-			event = event || window.event;
+			event     = event || window.event;
 			var _this = this;
 			switch (event.type) {
 				case "touchstart":
@@ -312,7 +327,7 @@
 					_this.infinitePosition();
 					break;
 				case "touchend":
-					_this.end.X    = event.changedTouches[0].clientX;
+					_this.end.X = event.changedTouches[0].clientX;
 					_this.end.time = new Date().getTime();
 					var tempDis    = (_this.end.X - _this.start.X).toFixed(2);
 					if (_this.end.time - _this.start.time < 150 && tempDis < 5) { // 如果是tap时间的话
@@ -326,26 +341,38 @@
 							}
 							_this.success(dataStamp, _this.resultArr);
 						}
-					} else {
-						var enddis                       = _this.distance + (tempDis - 0);
-						_this.box.style.transform        = 'translate3d(' + Math.round(enddis / _this.width) * _this.width + 'px, 0 , 0)';
-						_this.box.style.webkitTransform  = 'translate3d(' + Math.round(enddis / _this.width) * _this.width + 'px, 0 , 0)';
-						_this.box.style.transition       = 'transform .5s ease-out';
-						_this.box.style.webkitTransition = 'transform .5s ease-out';
-						if (_this.distance !== Math.round(enddis / _this.width) * _this.width) { // 确实滑动了
-							_this.switchItemBody(tempDis > 0, Math.round(enddis / _this.width));
+						transformFormat(_this.box,  _this.distance, 0.5);
+					} else if (!_this.isRangeChecked) {
+						var enddis = _this.distance + (tempDis - 0);
+						if (_this.end.X * 2 >= _this.width && tempDis * 3 >= _this.width) {
+							enddis = Math.ceil(enddis / _this.width);
+						} else {
+							enddis = Math.floor(enddis / _this.width);
 						}
-						_this.distance = Math.round(enddis / _this.width) * _this.width;
+						transformFormat(_this.box, enddis * _this.width, 0.5);
+						if (_this.distance !== enddis * _this.width) { // 确实滑动了
+							_this.switchItemBody(tempDis > 0, enddis);
+						}
+						_this.distance = enddis * _this.width;
+						_this.checkRange(_this.currentYear, _this.currentMonth);
 					}
 					break;
 				case "touchmove":
-					_this.move.X                     = event.touches[0].clientX;
-					var offset                       = (_this.move.X - _this.start.X).toFixed(2);
-					var movedis                      = _this.distance + (offset - 0);
-					_this.box.style.transform        = 'translate3d(' + movedis + 'px, 0 , 0)';
-					_this.box.style.webkitTransform  = 'translate3d(' + movedis + 'px, 0 , 0)';
-					_this.box.style.transition       = 'none';
-					_this.box.style.webkitTransition = 'none';
+					_this.move.X = event.touches[0].clientX;
+					var offset   = (_this.move.X - _this.start.X).toFixed(2);
+					if (offset < 0 && new Date(_this.currentYear, _this.currentMonth + 1).getTime() >= new Date(_this.endTime[0], _this.endTime[1]).getTime()) {
+						// 右滑到了临界点,
+						_this.isRangeChecked                                      = true;
+						$id(_this.container + 'CalendarTitleRight').style.display = 'none';
+					} else if (offset > 0 && new Date(_this.currentYear, _this.currentMonth - 1).getTime() <= new Date(_this.beginTime[0], _this.beginTime[1] - 2).getTime()) {
+						// 左滑到了零界点
+						_this.isRangeChecked                                     = true;
+						$id(_this.container + 'CalendarTitleLeft').style.display = 'none';
+					} else {
+						_this.isRangeChecked             = false;
+						var movedis                      = _this.distance + (offset - 0);
+						transformFormat(_this.box, movedis);
+					}
 					break;
 			}
 		}
@@ -361,4 +388,3 @@
 		win.Calendar = Calendar;
 	}
 })(window, document);
-

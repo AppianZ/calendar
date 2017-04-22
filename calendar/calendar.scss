@@ -23,6 +23,7 @@ $dateHeight : 40px;
   height: $dateHeight * 6 + $titleHeight;
   overflow: hidden;
   transition: height .3s ease .5s;
+  //touch-action: pan-y;
   &.shorter {
     height: $dateHeight * 5 + $titleHeight!important;
   }
