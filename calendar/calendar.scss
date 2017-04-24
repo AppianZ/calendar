@@ -18,11 +18,34 @@ body {
 $titleHeight : 50px;
 $dateHeight : 40px;
 
+.calendar-locked {
+  height: 100%!important;
+  overflow: hidden!important;
+}
+
+.calendar-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(75,75,75,0);
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  transition: all .3s ease;
+  -webkit-transition: all .3s ease;
+  z-index: -1;
+}
+
+.calendar-bg-up {
+  z-index: 999!important;
+  background: rgba(75,75,75,.8)!important;
+}
+
 .calendar-block {
   width: 100%;
   height: $dateHeight * 6 + $titleHeight;
   overflow: hidden;
-  transition: height .3s ease .5s;
+  transition: height .3s ease .3s;
   //touch-action: pan-y;
   &.shorter {
     height: $dateHeight * 5 + $titleHeight!important;
@@ -32,6 +55,20 @@ $dateHeight : 40px;
   }
 }
 
+.calendar-block-mask {
+  position: absolute;
+  bottom: 0;
+  transform: translate3d(0, 100%,0);
+  touch-action: none!important;
+}
+.calendar-block-mask-transition {
+  transition: all .5s ease;
+}
+
+.calendar-block-mask-up {
+  transform: translate3d(0,0,0)!important;
+}
+
 .calendar-title {
   position: relative;
   width: 100%;
@@ -39,6 +76,7 @@ $dateHeight : 40px;
   line-height: $titleHeight;
   text-align: center;
   overflow: hidden;
+  background: linear-gradient(120deg, #ddd 30%, #f5f5f5);
   span {
     position: absolute;
     display: inline-block;
@@ -67,6 +105,7 @@ $dateHeight : 40px;
     width: 20%;
     float: left;
     box-sizing: border-box;
+    background: #f8f8f8;
     .calendar-item-title {
       width: 100%;
       height: $dateHeight;
@@ -106,22 +145,4 @@ $dateHeight : 40px;
       }
     }
   }
-}
-
-
-
-.calendar-item0 {
-  background: #85D64D;
-}
-.calendar-item1 {
-  background: #abcdef;
-}
-.calendar-item2 {
-  background: #FF8877
-}
-.able1 {
-    background: rgba(255,255,255,.8);
-}
-.able2 {
-    background: rgba(255,0,255,.8);
 }

@@ -71,12 +71,12 @@
 	function generateTitleMonth(idx, year, month, cal) {
 		var monthLiLength = cal.box.querySelectorAll('.calendar-item.calendar-item' + idx)[0].querySelectorAll('li').length;
 		if (monthLiLength > 35) {
-			$id(cal.container).firstChild.classList.remove('shorter');
-			$id(cal.container).firstChild.classList.add('higher');
+			$id(cal.container).getElementsByClassName('calendar-block')[0].classList.remove('shorter');
+			$id(cal.container).getElementsByClassName('calendar-block')[0].classList.add('higher');
 		} else if (monthLiLength <= 28) {
-			$id(cal.container).firstChild.classList.remove('higher');
-			$id(cal.container).firstChild.classList.add('shorter');
-		} else $id(cal.container).firstChild.classList.remove('higher', 'shorter');
+			$id(cal.container).getElementsByClassName('calendar-block')[0].classList.remove('higher');
+			$id(cal.container).getElementsByClassName('calendar-block')[0].classList.add('shorter');
+		} else $id(cal.container).getElementsByClassName('calendar-block')[0].classList.remove('higher', 'shorter');
 		var monthArr = [['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
 			['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
 			['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'June.', 'July.', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'],
@@ -161,9 +161,10 @@
 	
 	function switchItemBody(direct, distance, cal) {
 		// direct: true 为左,direct:false为右。
+		var block = $id('calendar-block-' + cal.container);
 		cal.currentIdx                               = Math.abs(distance) % 3;
-		cal.currentYear                              = doc.querySelectorAll('.calendar-item.calendar-item' + cal.currentIdx)[0].getAttribute('data-year');
-		cal.currentMonth                             = doc.querySelectorAll('.calendar-item.calendar-item' + cal.currentIdx)[0].getAttribute('data-month') - 1;
+		cal.currentYear                              = block.querySelectorAll('.calendar-item.calendar-item' + cal.currentIdx)[0].getAttribute('data-year');
+		cal.currentMonth                             = block.querySelectorAll('.calendar-item.calendar-item' + cal.currentIdx)[0].getAttribute('data-month') - 1;
 		$id(cal.container + 'TitleCenter').innerHTML = generateTitleMonth(cal.currentIdx, cal.currentYear, cal.currentMonth,cal);
 		
 		var itemNum    = direct ? ((Math.abs(distance) - 1) % 3 < 0 ? 2 : (Math.abs(distance) - 1) % 3) : (Math.abs(distance) + 1) % 3;
@@ -181,6 +182,7 @@
 	}
 	
 	function touchStart(event, cal) {
+		$id('calendar-block-' + cal.container).classList.remove('calendar-block-mask-transition');
 		cal.start.X    = event.touches[0].clientX;
 		cal.start.time = new Date().getTime();
 		infinitePosition(cal);
@@ -252,7 +254,9 @@
 	}
 	
 	function Calendar(config) {
+		this.clickTarget     = config.clickTarget || '';
 		this.container       = config.container;
+		this.isMask          = config.isMask;
 		this.beginTime       = config.beginTime;
 		this.endTime         = config.endTime;
 		this.recentTime      = config.recentTime;
@@ -309,7 +313,9 @@
 			_this.currentYear  = _this.recentTime[0];
 			_this.currentMonth = _this.recentTime[1] - 1;
 			
-			html += '<div class="calendar-block">' +
+			html += _this.isMask ? '<div class="calendar-bg" id="calendar-bg-' + _this.container + '">' : '';
+			
+			html += '<div class="calendar-block' + (_this.isMask ? ' calendar-block-mask' : '') + '" id="calendar-block-' + _this.container + '">' +
 				'<div class="calendar-title">' +
 				'<span id="' + _this.container + 'CalendarTitleLeft" class="calendar-title-left">&#xe64f;</span>' +
 				'<span id="' + _this.container + 'CalendarTitleRight" class="calendar-title-right">&#xe64e;</span>' +
@@ -337,6 +343,8 @@
 				generateItemBodyDom(_this.currentYear, _this.currentMonth - 1,_this) + '</div>' +
 				' </div></div>';
 			
+			html += _this.isMask ? '</div>' : '';
+			
 			$id(_this.container).innerHTML = html;
 			_this.box                      = $id(_this.container + 'Box');
 			renderCallbackArr(_this.beforeRenderArr, _this);
@@ -352,6 +360,22 @@
 		},
 		initBinding: function () {
 			var _this = this;
+			if(_this.isMask) {
+				var bg        = $id('calendar-bg-' + _this.container);
+				var block = $id('calendar-block-' + _this.container);
+				var body      = doc.body;
+				on('touchstart', _this.clickTarget, function () {
+					bg.classList.add('calendar-bg-up');
+					block.classList.add('calendar-block-mask-up', 'calendar-block-mask-transition');
+					body.classList.add('calendar-locked');
+				}, false);
+				
+				on('touchstart', 'calendar-bg-' + _this.container, function () {
+					bg.classList.remove('calendar-bg-up');
+					block.classList.remove('calendar-block-mask-up');
+					body.classList.remove('calendar-locked');
+				}, false);
+			}
 			this.box.addEventListener('touchstart', function (e) {
 				touch(e, _this);
 			}, false);
