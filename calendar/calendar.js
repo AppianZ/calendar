@@ -60,9 +60,10 @@
 	
 	function checkRange(year, month, cal) {
 		// 用来判断生成的月份是否超过范围
-		if(!cal.isToggleBtn) return;
+		if (!cal.isToggleBtn) return;
 		$id(cal.container + 'CalendarTitleLeft').style.display  = 'inline-block';
 		$id(cal.container + 'CalendarTitleRight').style.display = 'inline-block';
+		if (cal.canViewDisabled) return;
 		if (new Date(year, month).getTime() >= new Date(cal.endTime[0], cal.endTime[1] - 1).getTime())
 			$id(cal.container + 'CalendarTitleRight').style.display = 'none';
 		if (new Date(year, month).getTime() <= new Date(cal.beginTime[0], cal.beginTime[1] - 1).getTime())
@@ -162,11 +163,11 @@
 	
 	function switchItemBody(direct, distance, cal) {
 		// direct: true 为左,direct:false为右。
-		var block = $id('calendar-block-' + cal.container);
+		var block                                    = $id('calendar-block-' + cal.container);
 		cal.currentIdx                               = Math.abs(distance) % 3;
 		cal.currentYear                              = block.querySelectorAll('.calendar-item.calendar-item' + cal.currentIdx)[0].getAttribute('data-year');
 		cal.currentMonth                             = block.querySelectorAll('.calendar-item.calendar-item' + cal.currentIdx)[0].getAttribute('data-month') - 1;
-		$id(cal.container + 'TitleCenter').innerHTML = generateTitleMonth(cal.currentIdx, cal.currentYear, cal.currentMonth,cal);
+		$id(cal.container + 'TitleCenter').innerHTML = generateTitleMonth(cal.currentIdx, cal.currentYear, cal.currentMonth, cal);
 		
 		var itemNum    = direct ? ((Math.abs(distance) - 1) % 3 < 0 ? 2 : (Math.abs(distance) - 1) % 3) : (Math.abs(distance) + 1) % 3;
 		var applyYear  = new Date(cal.currentYear, direct ? cal.currentMonth - 1 : cal.currentMonth + 1).getFullYear();
@@ -191,26 +192,31 @@
 	
 	function touchMove(event, cal) {
 		cal.move.X = event.touches[0].clientX;
-		var offset   = (cal.move.X - cal.start.X).toFixed(2);
-		if (offset < 0 && new Date(cal.currentYear, cal.currentMonth + 1).getTime() >= new Date(cal.endTime[0], cal.endTime[1]).getTime()) {
+		var offset = (cal.move.X - cal.start.X).toFixed(2);
+		
+		if (cal.canViewDisabled) {
+			cal.isRangeChecked = false;
+			var movedis        = cal.distance + (offset - 0);
+			transformFormat(cal.box, movedis);
+		} else if (offset < 0 && new Date(cal.currentYear, cal.currentMonth + 1).getTime() >= new Date(cal.endTime[0], cal.endTime[1]).getTime()) {
 			// 右滑到了临界点,
-			cal.isRangeChecked                                      = true;
-			if(cal.isToggleBtn) $id(cal.container + 'CalendarTitleRight').style.display = 'none';
+			cal.isRangeChecked = true;
+			if (cal.isToggleBtn) $id(cal.container + 'CalendarTitleRight').style.display = 'none';
 		} else if (offset > 0 && new Date(cal.currentYear, cal.currentMonth - 1).getTime() <= new Date(cal.beginTime[0], cal.beginTime[1] - 2).getTime()) {
 			// 左滑到了零界点
-			cal.isRangeChecked                                     = true;
-			if(cal.isToggleBtn) $id(cal.container + 'CalendarTitleLeft').style.display = 'none';
+			cal.isRangeChecked = true;
+			if (cal.isToggleBtn) $id(cal.container + 'CalendarTitleLeft').style.display = 'none';
 		} else {
-			cal.isRangeChecked             = false;
-			var movedis                      = cal.distance + (offset - 0);
+			cal.isRangeChecked = false;
+			var movedis        = cal.distance + (offset - 0);
 			transformFormat(cal.box, movedis);
 		}
 	}
 	
 	function touchEnd(event, cal) {
-		cal.end.X = event.changedTouches[0].clientX;
+		cal.end.X    = event.changedTouches[0].clientX;
 		cal.end.time = new Date().getTime();
-		var tempDis    = (cal.end.X - cal.start.X).toFixed(2);
+		var tempDis  = (cal.end.X - cal.start.X).toFixed(2);
 		if (cal.end.time - cal.start.time < 150 && tempDis < 5) { // 如果是tap时间的话
 			if (event.target.matches('i') && event.target.id !== '') {
 				var dataStamp = event.target.getAttribute('data-stamp');
@@ -222,7 +228,7 @@
 				}
 				cal.success(dataStamp, cal.resultArr);
 			}
-			transformFormat(cal.box,  cal.distance, 0.5);
+			transformFormat(cal.box, cal.distance, 0.5);
 		} else if (!cal.isRangeChecked) {
 			var enddis = cal.distance + (tempDis - 0);
 			if (cal.end.X * 2 >= cal.width && tempDis * 3 >= cal.width) {
@@ -240,7 +246,7 @@
 	}
 	
 	function touch(event, cal) {
-		event     = event || window.event;
+		event = event || window.event;
 		switch (event.type) {
 			case "touchstart":
 				touchStart(event, cal);
@@ -322,7 +328,7 @@
 			html += _this.isToggleBtn ? '<span id="' + _this.container + 'CalendarTitleLeft" class="calendar-title-left">&#xe64f;</span>' +
 			'<span id="' + _this.container + 'CalendarTitleRight" class="calendar-title-right">&#xe64e;</span>' : '';
 			
-			html +=	'<b id="' + _this.container + 'TitleCenter"></b></div>' +
+			html += '<b id="' + _this.container + 'TitleCenter"></b></div>' +
 				' <div id="' + _this.container + 'Box" class="calendar-box">' +
 				'<div class="calendar-item calendar-item0"' +
 				' data-year="' + new Date(_this.currentYear, _this.currentMonth + 1).getFullYear() + '"' +
@@ -343,7 +349,7 @@
 				'<div class="calendar-item calendar-item1"' +
 				' data-year="' + new Date(_this.currentYear, _this.currentMonth - 1).getFullYear() + '"' +
 				' data-month="' + (new Date(_this.currentYear, _this.currentMonth - 1).getMonth() + 1) + '">' +
-				generateItemBodyDom(_this.currentYear, _this.currentMonth - 1,_this) + '</div>' +
+				generateItemBodyDom(_this.currentYear, _this.currentMonth - 1, _this) + '</div>' +
 				' </div></div>';
 			
 			html += _this.isMask ? '</div>' : '';
@@ -363,10 +369,10 @@
 		},
 		initBinding: function () {
 			var _this = this;
-			if(_this.isMask) {
-				var bg        = $id('calendar-bg-' + _this.container);
+			if (_this.isMask) {
+				var bg    = $id('calendar-bg-' + _this.container);
 				var block = $id('calendar-block-' + _this.container);
-				var body      = doc.body;
+				var body  = doc.body;
 				on('touchstart', _this.clickTarget, function () {
 					bg.classList.add('calendar-bg-up');
 					block.classList.add('calendar-block-mask-up', 'calendar-block-mask-transition');
@@ -388,7 +394,7 @@
 			this.box.addEventListener('touchend', function (e) {
 				touch(e, _this);
 			}, true);
-			if(_this.isToggleBtn) {
+			if (_this.isToggleBtn) {
 				on('touchstart', _this.container + 'CalendarTitleLeft', function () {
 					infinitePosition(_this);
 					_this.distance = _this.distance + _this.width;
