@@ -60,6 +60,7 @@
 	
 	function checkRange(year, month, cal) {
 		// 用来判断生成的月份是否超过范围
+		if(!cal.isToggleBtn) return;
 		$id(cal.container + 'CalendarTitleLeft').style.display  = 'inline-block';
 		$id(cal.container + 'CalendarTitleRight').style.display = 'inline-block';
 		if (new Date(year, month).getTime() >= new Date(cal.endTime[0], cal.endTime[1] - 1).getTime())
@@ -194,11 +195,11 @@
 		if (offset < 0 && new Date(cal.currentYear, cal.currentMonth + 1).getTime() >= new Date(cal.endTime[0], cal.endTime[1]).getTime()) {
 			// 右滑到了临界点,
 			cal.isRangeChecked                                      = true;
-			$id(cal.container + 'CalendarTitleRight').style.display = 'none';
+			if(cal.isToggleBtn) $id(cal.container + 'CalendarTitleRight').style.display = 'none';
 		} else if (offset > 0 && new Date(cal.currentYear, cal.currentMonth - 1).getTime() <= new Date(cal.beginTime[0], cal.beginTime[1] - 2).getTime()) {
 			// 左滑到了零界点
 			cal.isRangeChecked                                     = true;
-			$id(cal.container + 'CalendarTitleLeft').style.display = 'none';
+			if(cal.isToggleBtn) $id(cal.container + 'CalendarTitleLeft').style.display = 'none';
 		} else {
 			cal.isRangeChecked             = false;
 			var movedis                      = cal.distance + (offset - 0);
@@ -316,10 +317,12 @@
 			html += _this.isMask ? '<div class="calendar-bg" id="calendar-bg-' + _this.container + '">' : '';
 			
 			html += '<div class="calendar-block' + (_this.isMask ? ' calendar-block-mask' : '') + '" id="calendar-block-' + _this.container + '">' +
-				'<div class="calendar-title">' +
-				'<span id="' + _this.container + 'CalendarTitleLeft" class="calendar-title-left">&#xe64f;</span>' +
-				'<span id="' + _this.container + 'CalendarTitleRight" class="calendar-title-right">&#xe64e;</span>' +
-				'<b id="' + _this.container + 'TitleCenter"></b></div>' +
+				'<div class="calendar-title">';
+			
+			html += _this.isToggleBtn ? '<span id="' + _this.container + 'CalendarTitleLeft" class="calendar-title-left">&#xe64f;</span>' +
+			'<span id="' + _this.container + 'CalendarTitleRight" class="calendar-title-right">&#xe64e;</span>' : '';
+			
+			html +=	'<b id="' + _this.container + 'TitleCenter"></b></div>' +
 				' <div id="' + _this.container + 'Box" class="calendar-box">' +
 				'<div class="calendar-item calendar-item0"' +
 				' data-year="' + new Date(_this.currentYear, _this.currentMonth + 1).getFullYear() + '"' +
@@ -385,20 +388,22 @@
 			this.box.addEventListener('touchend', function (e) {
 				touch(e, _this);
 			}, true);
-			on('touchstart', _this.container + 'CalendarTitleLeft', function () {
-				infinitePosition(_this);
-				_this.distance = _this.distance + _this.width;
-				transformFormat(_this.box, _this.distance);
-				switchItemBody(true, _this.distance / _this.width, _this);
-				checkRange(_this.currentYear, _this.currentMonth, _this);
-			});
-			on('touchstart', _this.container + 'CalendarTitleRight', function () {
-				infinitePosition(_this);
-				_this.distance = _this.distance - _this.width;
-				transformFormat(_this.box, _this.distance);
-				switchItemBody(false, _this.distance / _this.width, _this);
-				checkRange(_this.currentYear, _this.currentMonth, _this);
-			});
+			if(_this.isToggleBtn) {
+				on('touchstart', _this.container + 'CalendarTitleLeft', function () {
+					infinitePosition(_this);
+					_this.distance = _this.distance + _this.width;
+					transformFormat(_this.box, _this.distance);
+					switchItemBody(true, _this.distance / _this.width, _this);
+					checkRange(_this.currentYear, _this.currentMonth, _this);
+				});
+				on('touchstart', _this.container + 'CalendarTitleRight', function () {
+					infinitePosition(_this);
+					_this.distance = _this.distance - _this.width;
+					transformFormat(_this.box, _this.distance);
+					switchItemBody(false, _this.distance / _this.width, _this);
+					checkRange(_this.currentYear, _this.currentMonth, _this);
+				});
+			}
 		},
 	};
 	
