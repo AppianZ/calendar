@@ -104,8 +104,8 @@
 		var lastDateCount = new Date(year, month, 0).getDate();
 		var firstInDay    = new Date(year, month, 1).getDay();
 		var lastInDay     = new Date(year, month + 1, 0).getDay();
-		var beforeCount   = this.isSundayFirst ? firstInDay : (firstInDay === 0 ? 6 : firstInDay - 1);
-		var afterCount    = this.isSundayFirst ? (6 - lastInDay) : (lastInDay === 0 ? 0 : 7 - lastInDay);
+		var beforeCount   = cal.isSundayFirst ? firstInDay : (firstInDay === 0 ? 6 : firstInDay - 1);
+		var afterCount    = cal.isSundayFirst ? (6 - lastInDay) : (lastInDay === 0 ? 0 : 7 - lastInDay);
 		loop(0, beforeCount, function (i) {
 			if (cal.isShowNeighbor) recentArr.unshift((lastDateCount - i) + 'b');
 			else recentArr.unshift('' + 'b');
