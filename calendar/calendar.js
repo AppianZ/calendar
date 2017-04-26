@@ -138,7 +138,7 @@
 			} else {
 				tempStamp = new Date(year, month, dateArr[i]).getTime();
 				html += '<li' + (tempStamp >= cal.beginStamp && tempStamp <= cal.endStamp ?
-					' id="'+ cal.container + '-item-' + tempStamp + '" data-stamp="' + tempStamp + '"' : ' class="disabled"') +
+					' class="'+ cal.container + '-item-' + tempStamp + '" data-stamp="' + tempStamp + '"' : ' class="disabled"') +
 					'><i data-stamp="' + tempStamp + '">' + dateArr[i] + '</i></li>';
 			}
 		});
