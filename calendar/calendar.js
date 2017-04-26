@@ -157,12 +157,12 @@
 	
 	function renderCallbackArr(arr, cal) {
 		loop(0, arr.length, function (k) {
-			if (!$class(cal.container + '-item-' + arr[k].stamp)[0]) {
+			if (!$id(cal.container).getElementsByClassName(cal.container + '-item-' + arr[k].stamp)[0]) {
 				console.error(cal.container + '-item-' + arr[k].stamp + ' 不在范围内,请检查你的时间戳');
 				return true;
 			}
-			loop(0, $class(cal.container + '-item-' + arr[k].stamp).length, function (j) {
-				$class(cal.container + '-item-' + arr[k].stamp)[j].classList.add(arr[k].className);
+			loop(0, $id(cal.container).getElementsByClassName(cal.container + '-item-' + arr[k].stamp).length, function (j) {
+				$id(cal.container).getElementsByClassName(cal.container + '-item-' + arr[k].stamp)[j].classList.add(arr[k].className);
 			})
 		})
 	}
