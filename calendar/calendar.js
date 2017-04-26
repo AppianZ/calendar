@@ -134,8 +134,8 @@
 			} else {
 				tempStamp = new Date(year, month, dateArr[i]).getTime();
 				html += '<li' + (tempStamp >= cal.beginStamp && tempStamp <= cal.endStamp ?
-						'' : ' class="disabled"') +
-					'><i data-stamp="' + tempStamp + '" id="' + cal.container + '-item-' + tempStamp + '">' + dateArr[i] + '</i></li>';
+					' id="'+ cal.container + '-item-' + tempStamp + '" data-stamp="' + tempStamp + '"' : ' class="disabled"') +
+					'><i data-stamp="' + tempStamp + '">' + dateArr[i] + '</i></li>';
 			}
 		});
 		return html + '</ul>';
@@ -218,7 +218,7 @@
 		cal.end.time = new Date().getTime();
 		var tempDis  = (cal.end.X - cal.start.X).toFixed(2);
 		if (cal.end.time - cal.start.time < 150 && tempDis < 5) { // 如果是tap时间的话
-			if (event.target.matches('i') && event.target.id !== '') {
+			if (event.target.matches('li') && event.target.id !== '' || event.target.matches('i') && event.target.parentNode.id !== '') {
 				var dataStamp = event.target.getAttribute('data-stamp');
 				if (cal.resultArr.length === 0) cal.resultArr.push(dataStamp);
 				else if (cal.resultArr.length === 1) cal.resultArr[0] < dataStamp ? cal.resultArr.push(dataStamp) : cal.resultArr.unshift(dataStamp);
@@ -397,17 +397,22 @@
 			if (_this.isToggleBtn) {
 				on('touchstart', _this.container + 'CalendarTitleLeft', function () {
 					infinitePosition(_this);
-					_this.distance = _this.distance + _this.width;
-					transformFormat(_this.box, _this.distance);
-					switchItemBody(true, _this.distance / _this.width, _this);
-					checkRange(_this.currentYear, _this.currentMonth, _this);
+					setTimeout(function () {
+						_this.distance = _this.distance + _this.width;
+						transformFormat(_this.box, _this.distance,.5);
+						switchItemBody(true, _this.distance / _this.width, _this);
+						checkRange(_this.currentYear, _this.currentMonth, _this);
+					},300);
+					
 				});
 				on('touchstart', _this.container + 'CalendarTitleRight', function () {
 					infinitePosition(_this);
-					_this.distance = _this.distance - _this.width;
-					transformFormat(_this.box, _this.distance);
-					switchItemBody(false, _this.distance / _this.width, _this);
-					checkRange(_this.currentYear, _this.currentMonth, _this);
+					setTimeout(function () {
+						_this.distance = _this.distance - _this.width;
+						transformFormat(_this.box, _this.distance,.5);
+						switchItemBody(false, _this.distance / _this.width, _this);
+						checkRange(_this.currentYear, _this.currentMonth, _this);
+					},300);
 				});
 			}
 		},
