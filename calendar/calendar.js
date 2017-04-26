@@ -399,20 +399,20 @@
 					infinitePosition(_this);
 					setTimeout(function () {
 						_this.distance = _this.distance + _this.width;
-						transformFormat(_this.box, _this.distance,.5);
+						transformFormat(_this.box, _this.distance,.3);
 						switchItemBody(true, _this.distance / _this.width, _this);
 						checkRange(_this.currentYear, _this.currentMonth, _this);
-					},300);
+					},100);
 					
 				});
 				on('touchstart', _this.container + 'CalendarTitleRight', function () {
 					infinitePosition(_this);
 					setTimeout(function () {
 						_this.distance = _this.distance - _this.width;
-						transformFormat(_this.box, _this.distance,.5);
+						transformFormat(_this.box, _this.distance,.3);
 						switchItemBody(false, _this.distance / _this.width, _this);
 						checkRange(_this.currentYear, _this.currentMonth, _this);
-					},300);
+					},100);
 				});
 			}
 		},
