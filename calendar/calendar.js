@@ -10,6 +10,10 @@
 		return doc.getElementById(id);
 	}
 	
+	function $class(name) {
+		return doc.getElementsByClassName(name);
+	}
+	
 	function loop(begin, length, fn) {
 		for ( var i = begin; i < length; i++ ) {
 			if (fn(i)) break;
@@ -153,11 +157,13 @@
 	
 	function renderCallbackArr(arr, cal) {
 		loop(0, arr.length, function (k) {
-			if (!$id(cal.container + '-item-' + arr[k].stamp)) {
+			if (!$class(cal.container + '-item-' + arr[k].stamp)[0]) {
 				console.error(cal.container + '-item-' + arr[k].stamp + ' 不在范围内,请检查你的时间戳');
 				return true;
 			}
-			$id(cal.container + '-item-' + arr[k].stamp).classList.add(arr[k].className);
+			loop(0, $class(cal.container + '-item-' + arr[k].stamp).length, function (j) {
+				$class(cal.container + '-item-' + arr[k].stamp)[j].classList.add(arr[k].className);
+			})
 		})
 	}
 	
@@ -218,7 +224,7 @@
 		cal.end.time = new Date().getTime();
 		var tempDis  = (cal.end.X - cal.start.X).toFixed(2);
 		if (cal.end.time - cal.start.time < 150 && tempDis < 5) { // 如果是tap时间的话
-			if (event.target.matches('li') && event.target.id !== '' || event.target.matches('i') && event.target.parentNode.id !== '') {
+			if (event.target.matches('li') && event.target.className !== 'disabled' || event.target.matches('i') && event.target.parentNode.className !== 'disabled') {
 				var dataStamp = event.target.getAttribute('data-stamp');
 				if (cal.resultArr.length === 0) cal.resultArr.push(dataStamp);
 				else if (cal.resultArr.length === 1) cal.resultArr[0] < dataStamp ? cal.resultArr.push(dataStamp) : cal.resultArr.unshift(dataStamp);
