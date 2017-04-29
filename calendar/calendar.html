@@ -9,6 +9,10 @@
 	<title>calendar</title>
 	<link rel="stylesheet" href="calendar.css">
 	<style>
+		body {
+			height: 100%;
+			background: #fff;
+		}
 		#target {
 			width: 100%;
 			height: 60px;
@@ -69,12 +73,13 @@
 		success: function (item, arr) {
 			console.log(item, arr);
 		},
-		switchRender: function (year, month) {
+		switchRender: function (year, month, cal) {
 			console.log('计算机识别的 - 年份: ' + year + ' 月份: ' + month);
-			return [{
+			var data = [{
 				'stamp': 1507737600000,
 				'className': 'able1',
-			}]
+			}];
+			cal.renderCallbackArr(data);
 		}
 	});
 
@@ -99,12 +104,13 @@
 		success: function (item, arr) {
 			console.log(item, arr);
 		},
-		switchRender: function (year, month) {
+		switchRender: function (year, month, cal) {
 			console.log('计算机识别的 - 年份: ' + year + ' 月份: ' + month);
-			return [{
+			var data = [{
 				'stamp': 1507737600000,
 				'className': 'able1',
-			}]
+			}];
+			cal.renderCallbackArr(data);
 		}
 	});
 </script>

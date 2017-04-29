@@ -155,18 +155,6 @@
 		}
 	}
 	
-	function renderCallbackArr(arr, cal) {
-		loop(0, arr.length, function (k) {
-			if (!$class(cal.container + '-item-' + arr[k].stamp)[0]) {
-				console.error(cal.container + '-item-' + arr[k].stamp + ' 不在范围内,请检查你的时间戳');
-				return true;
-			}
-			loop(0, $class(cal.container + '-item-' + arr[k].stamp).length, function (j) {
-				$class(cal.container + '-item-' + arr[k].stamp)[j].classList.add(arr[k].className);
-			})
-		})
-	}
-	
 	function switchItemBody(direct, distance, cal) {
 		// direct: true 为左,direct:false为右。
 		var block                                    = $id('calendar-block-' + cal.container);
@@ -185,8 +173,7 @@
 			obj.setAttribute('data-month', applyMonth + 1);
 		});
 		
-		var newMonthRenderArr = cal.switchRender(applyYear, applyMonth); // 获得回调后的数组,并执行操作
-		renderCallbackArr(newMonthRenderArr, cal);
+		cal.switchRender(applyYear, applyMonth, cal); // 获得回调后的数组,并执行操作
 	}
 	
 	function touchStart(event, cal) {
@@ -362,7 +349,7 @@
 			
 			$id(_this.container).innerHTML = html;
 			_this.box                      = $id(_this.container + 'Box');
-			renderCallbackArr(_this.beforeRenderArr, _this);
+			_this.renderCallbackArr(_this.beforeRenderArr);
 		},
 		initReady: function () {
 			this.box.style.transform                      = 'translate3d(-' + this.currentIdx * this.width + 'px, 0 , 0)';
@@ -422,6 +409,18 @@
 				});
 			}
 		},
+		renderCallbackArr: function(arr) {
+			var _this = this;
+			loop(0, arr.length, function (k) {
+				if (!$class(_this.container + '-item-' + arr[k].stamp)[0]) {
+					console.error(_this.container + '-item-' + arr[k].stamp + ' 不在范围内,请检查你的时间戳');
+					return true;
+				}
+				loop(0, $class(_this.container + '-item-' + arr[k].stamp).length, function (j) {
+					$class(_this.container + '-item-' + arr[k].stamp)[j].classList.add(arr[k].className);
+				})
+			})
+		}
 	};
 	
 	if (typeof exports == "object") {
