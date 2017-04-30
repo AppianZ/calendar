@@ -210,7 +210,7 @@
 		cal.end.X    = event.changedTouches[0].clientX;
 		cal.end.time = new Date().getTime();
 		var tempDis  = (cal.end.X - cal.start.X).toFixed(2);
-		if (cal.end.time - cal.start.time < 150 && tempDis < 5) { // 如果是tap时间的话
+		if (cal.end.time - cal.start.time < 100 && Math.abs(tempDis)  < 5) { // 如果是tap时间的话
 			if (event.target.matches('li') && event.target.className !== 'disabled' || event.target.matches('i') && event.target.parentNode.className !== 'disabled') {
 				var dataStamp = event.target.getAttribute('data-stamp');
 				if (cal.resultArr.length === 0) cal.resultArr.push(dataStamp);
@@ -224,7 +224,7 @@
 			transformFormat(cal.box, cal.distance, 0.5);
 		} else if (!cal.isRangeChecked) {
 			var enddis = cal.distance + (tempDis - 0);
-			if (cal.end.X * 2 >= cal.width && tempDis * 3 >= cal.width) {
+			if (cal.end.X * 2 >= cal.width && Math.abs(tempDis) * 5 >= cal.width) {
 				enddis = Math.ceil(enddis / cal.width);
 			} else {
 				enddis = Math.floor(enddis / cal.width);
