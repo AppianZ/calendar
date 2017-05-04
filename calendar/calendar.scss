@@ -41,18 +41,27 @@ $dateHeight : 40px;
   background: rgba(75,75,75,.8)!important;
 }
 
+.calendar-bg.calendar-bg-delay {
+  z-index: 0;
+}
+
+
+
 .calendar-block {
   width: 100%;
   height: $dateHeight * 6 + $titleHeight;
   overflow: hidden;
-  transition: height .3s ease .3s;
-  //touch-action: pan-y;
+  transition: all .3s ease .2s;
   &.shorter {
     height: $dateHeight * 5 + $titleHeight!important;
   }
   &.higher {
     height: $dateHeight * 7 + $titleHeight!important;
   }
+}
+
+.calendar-block-action-none {
+  touch-action: none;
 }
 
 .calendar-block-mask {

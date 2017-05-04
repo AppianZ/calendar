@@ -179,34 +179,48 @@
 	function touchStart(event, cal) {
 		$id('calendar-block-' + cal.container).classList.remove('calendar-block-mask-transition');
 		cal.start.X    = event.touches[0].clientX;
+		cal.start.Y    = event.touches[0].clientY;
 		cal.start.time = new Date().getTime();
 		infinitePosition(cal);
 	}
 	
 	function touchMove(event, cal) {
-		cal.move.X = event.touches[0].clientX;
+		cal.move.Y = event.touches[0].clientY;
 		var offset = (cal.move.X - cal.start.X).toFixed(2);
 		
-		if (cal.canViewDisabled) {
-			cal.isRangeChecked = false;
-			var movedis        = cal.distance + (offset - 0);
-			transformFormat(cal.box, movedis);
-		} else if (offset < 0 && new Date(cal.currentYear, cal.currentMonth + 1).getTime() >= new Date(cal.endTime[0], cal.endTime[1]).getTime()) {
-			// 右滑到了临界点,
-			cal.isRangeChecked = true;
-			if (cal.isToggleBtn) $id(cal.container + 'CalendarTitleRight').style.display = 'none';
-		} else if (offset > 0 && new Date(cal.currentYear, cal.currentMonth - 1).getTime() <= new Date(cal.beginTime[0], cal.beginTime[1] - 2).getTime()) {
-			// 左滑到了零界点
-			cal.isRangeChecked = true;
-			if (cal.isToggleBtn) $id(cal.container + 'CalendarTitleLeft').style.display = 'none';
+		cal.move.increaseX = cal.move.count == 0 ? event.touches[0].clientX - cal.start.X : cal.move.X - cal.start.X;
+		cal.move.increaseY = Math.abs(cal.move.Y - cal.start.Y);
+		cal.move.S += cal.move.increaseX * cal.move.increaseY;
+		cal.move.standardS += cal.move.increaseX * cal.move.increaseX * cal.move.standard;
+		cal.move.X = event.touches[0].clientX;
+		cal.move.count++;
+		
+		if(Math.abs(cal.move.S) > Math.abs(cal.move.standardS)) {
+			doc.body.removeEventListener('touchmove', cal.prevent); // 防止乱滑
 		} else {
-			cal.isRangeChecked = false;
-			var movedis        = cal.distance + (offset - 0);
-			transformFormat(cal.box, movedis);
+			doc.body.addEventListener('touchmove', cal.prevent); // 防止乱滑
+			if (cal.canViewDisabled) {
+				cal.isRangeChecked = false;
+				var movedis        = cal.distance + (offset - 0);
+				transformFormat(cal.box, movedis);
+			} else if (offset < 0 && new Date(cal.currentYear, cal.currentMonth + 1).getTime() >= new Date(cal.endTime[0], cal.endTime[1]).getTime()) {
+				// 右滑到了临界点,
+				cal.isRangeChecked = true;
+				if (cal.isToggleBtn) $id(cal.container + 'CalendarTitleRight').style.display = 'none';
+			} else if (offset > 0 && new Date(cal.currentYear, cal.currentMonth - 1).getTime() <= new Date(cal.beginTime[0], cal.beginTime[1] - 2).getTime()) {
+				// 左滑到了零界点
+				cal.isRangeChecked = true;
+				if (cal.isToggleBtn) $id(cal.container + 'CalendarTitleLeft').style.display = 'none';
+			} else {
+				cal.isRangeChecked = false;
+				var movedis        = cal.distance + (offset - 0);
+				transformFormat(cal.box, movedis);
+			}
 		}
 	}
 	
 	function touchEnd(event, cal) {
+		cal.move.X = cal.move.Y = cal.move.count = cal.move.S = cal.move.standardS = 0;
 		cal.end.X    = event.changedTouches[0].clientX;
 		cal.end.time = new Date().getTime();
 		var tempDis  = (cal.end.X - cal.start.X).toFixed(2);
@@ -219,7 +233,7 @@
 					cal.resultArr.length = 0;
 					cal.resultArr.push(dataStamp);
 				}
-				cal.success(dataStamp, cal.resultArr);
+				cal.success(dataStamp, cal.resultArr, cal);
 			}
 			transformFormat(cal.box, cal.distance, 0.5);
 		} else if (!cal.isRangeChecked) {
@@ -292,13 +306,18 @@
 		this.move  = {
 			X: 0,
 			Y: 0,
+			increaseX: 0,
+			increaseY: 0,
+			count: 0,
+			S: 0,
+			standard: 0.26795, // tan15
+			standardS: 0
 		};
 		this.end   = {
 			X: 0,
 			Y: 0,
 			time: 0
 		};
-		
 		this.initDomFuc();
 		this.initReady();
 		this.initBinding();
@@ -367,15 +386,20 @@
 				var block = $id('calendar-block-' + _this.container);
 				var body  = doc.body;
 				on('touchstart', _this.clickTarget, function () {
-					bg.classList.add('calendar-bg-up');
-					block.classList.add('calendar-block-mask-up', 'calendar-block-mask-transition');
+					bg.classList.add('calendar-bg-up', 'calendar-bg-delay');
+					block.classList.add('calendar-block-mask-up', 'calendar-block-mask-transition', 'calendar-block-action-none');
 					body.classList.add('calendar-locked');
+					body.addEventListener('touchmove', _this.prevent); // 防止乱滑
 				}, false);
 				
 				on('touchstart', 'calendar-bg-' + _this.container, function () {
 					bg.classList.remove('calendar-bg-up');
-					block.classList.remove('calendar-block-mask-up');
+					block.classList.remove('calendar-block-mask-up', 'calendar-block-action-none');
 					body.classList.remove('calendar-locked');
+					setTimeout(function () {
+						bg.classList.remove('calendar-bg-delay'); // 防止点透
+					}, 300);
+					body.removeEventListener('touchmove', _this.prevent);
 				}, false);
 			}
 			this.box.addEventListener('touchstart', function (e) {
@@ -420,6 +444,23 @@
 					$class(_this.container + '-item-' + arr[k].stamp)[j].classList.add(arr[k].className);
 				})
 			})
+		},
+		prevent: function	(e) {
+			e.preventDefault();
+		},
+		hideBackground: function(){
+			if(!this.isMask) return;
+			var _this = this;
+			var bg    = $id('calendar-bg-' + _this.container);
+			var block = $id('calendar-block-' + _this.container);
+			var body  = doc.body;
+			bg.classList.remove('calendar-bg-up');
+			block.classList.remove('calendar-block-mask-up', 'calendar-block-action-none');
+			body.classList.remove('calendar-locked');
+			setTimeout(function () {
+				bg.classList.remove('calendar-bg-delay'); // 防止点透
+			}, 300);
+			body.removeEventListener('touchmove', _this.prevent);
 		}
 	};
 	
