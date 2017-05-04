@@ -57,6 +57,7 @@
 		// 用户传入实际的数据
 		clickTarget: 'target',
 		container: 'container',
+		angle: 0,
 		isMask: true, // 是否需要弹层
 		beginTime: [2017, 1, 1],//如空数组默认设置成1970年1月1日开始,数组的每一位分别是年月日。
 		endTime: [2018, 1, 13],//如空数组默认设置成次年12月31日,数组的每一位分别是年月日。
@@ -89,6 +90,7 @@
 	new Calendar({
 		// 用户传入实际的数据
 		container: 'container2',
+		angle: 8,
 		isMask: false, // 是否需要弹层
 		beginTime: [2018, 1, 1],//如空数组默认设置成1970年1月1日开始,数组的每一位分别是年月日。
 		endTime: [2018, 1, 13],//如空数组默认设置成次年12月31日,数组的每一位分别是年月日。
@@ -97,7 +99,7 @@
 		isShowNeighbor: true, // 是否展示相邻月份的月尾和月头
 		isToggleBtn: true, // 是否展示左右切换按钮
 		isChinese: true, // 是否是中文
-		monthType: 3, // 0:1月, 1:一月, 2:Jan, 3: April
+		monthType: 0, // 0:1月, 1:一月, 2:Jan, 3: April
 		canViewDisabled: true, // 是否可以阅读不在范围内的月份
 		beforeRenderArr: [{
 			stamp: 1514822400000,

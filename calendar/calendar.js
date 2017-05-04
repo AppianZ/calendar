@@ -138,7 +138,7 @@
 			} else {
 				tempStamp = new Date(year, month, dateArr[i]).getTime();
 				html += '<li' + (tempStamp >= cal.beginStamp && tempStamp <= cal.endStamp ?
-					' class="'+ cal.container + '-item-' + tempStamp + '" data-stamp="' + tempStamp + '"' : ' class="disabled"') +
+					' class="' + cal.container + '-item-' + tempStamp + '" data-stamp="' + tempStamp + '"' : ' class="disabled"') +
 					'><i data-stamp="' + tempStamp + '">' + dateArr[i] + '</i></li>';
 			}
 		});
@@ -188,17 +188,18 @@
 		cal.move.Y = event.touches[0].clientY;
 		var offset = (cal.move.X - cal.start.X).toFixed(2);
 		
-		cal.move.increaseX = cal.move.count == 0 ? event.touches[0].clientX - cal.start.X : cal.move.X - cal.start.X;
+		cal.move.increaseX = cal.move.isFirst ? event.touches[0].clientX - cal.start.X : cal.move.X - cal.start.X;
 		cal.move.increaseY = Math.abs(cal.move.Y - cal.start.Y);
 		cal.move.S += cal.move.increaseX * cal.move.increaseY;
 		cal.move.standardS += cal.move.increaseX * cal.move.increaseX * cal.move.standard;
-		cal.move.X = event.touches[0].clientX;
-		cal.move.count++;
+		cal.move.X         = event.touches[0].clientX;
+		cal.move.isFirst = false;
 		
-		if(Math.abs(cal.move.S) > Math.abs(cal.move.standardS)) {
-			doc.body.removeEventListener('touchmove', cal.prevent); // 防止乱滑
+		if (Math.abs(cal.move.S) >= Math.abs(cal.move.standardS) && !cal.isMask) {
+			doc.body.removeEventListener('touchmove', cal.prevent, true);
+			transformFormat(cal.box, cal.distance, .3);
 		} else {
-			doc.body.addEventListener('touchmove', cal.prevent); // 防止乱滑
+			doc.body.addEventListener('touchmove', cal.prevent, true); // 防止乱滑
 			if (cal.canViewDisabled) {
 				cal.isRangeChecked = false;
 				var movedis        = cal.distance + (offset - 0);
@@ -220,35 +221,36 @@
 	}
 	
 	function touchEnd(event, cal) {
-		cal.move.X = cal.move.Y = cal.move.count = cal.move.S = cal.move.standardS = 0;
 		cal.end.X    = event.changedTouches[0].clientX;
 		cal.end.time = new Date().getTime();
 		var tempDis  = (cal.end.X - cal.start.X).toFixed(2);
-		if (cal.end.time - cal.start.time < 100 && Math.abs(tempDis)  < 5) { // 如果是tap时间的话
-			if (event.target.matches('li') && event.target.className !== 'disabled' || event.target.matches('i') && event.target.parentNode.className !== 'disabled') {
-				var dataStamp = event.target.getAttribute('data-stamp');
-				if (cal.resultArr.length === 0) cal.resultArr.push(dataStamp);
-				else if (cal.resultArr.length === 1) cal.resultArr[0] < dataStamp ? cal.resultArr.push(dataStamp) : cal.resultArr.unshift(dataStamp);
-				else {
-					cal.resultArr.length = 0;
-					cal.resultArr.push(dataStamp);
+		if (Math.abs(cal.move.S) >= Math.abs(cal.move.standardS) && !cal.isMask) {
+		} else {
+			if (cal.end.time - cal.start.time < 100 && Math.abs(tempDis) < 5) {
+				if (event.target.matches('li') && event.target.className !== 'disabled' || event.target.matches('i') && event.target.parentNode.className !== 'disabled') {
+					var dataStamp = event.target.getAttribute('data-stamp');
+					if (cal.resultArr.length === 0) cal.resultArr.push(dataStamp);
+					else if (cal.resultArr.length === 1) cal.resultArr[0] < dataStamp ? cal.resultArr.push(dataStamp) : cal.resultArr.unshift(dataStamp);
+					else {
+						cal.resultArr.length = 0;
+						cal.resultArr.push(dataStamp);
+					}
+					cal.success(dataStamp, cal.resultArr, cal);
 				}
-				cal.success(dataStamp, cal.resultArr, cal);
+				transformFormat(cal.box, cal.distance, 0.5);
+			} else if (!cal.isRangeChecked) {
+				var enddis = cal.distance + (tempDis - 0);
+				enddis     = (cal.end.X * 2 >= cal.width && Math.abs(tempDis) * 5 >= cal.width) ?
+					Math.ceil(enddis / cal.width) : Math.floor(enddis / cal.width);
+				transformFormat(cal.box, enddis * cal.width, 0.5);
+				if (cal.distance !== enddis * cal.width) { // 确实滑动了
+					switchItemBody(tempDis > 0, enddis, cal);
+				}
+				cal.distance = enddis * cal.width;
+				checkRange(cal.currentYear, cal.currentMonth, cal);
 			}
-			transformFormat(cal.box, cal.distance, 0.5);
-		} else if (!cal.isRangeChecked) {
-			var enddis = cal.distance + (tempDis - 0);
-			if (cal.end.X * 2 >= cal.width && Math.abs(tempDis) * 5 >= cal.width) {
-				enddis = Math.ceil(enddis / cal.width);
-			} else {
-				enddis = Math.floor(enddis / cal.width);
-			}
-			transformFormat(cal.box, enddis * cal.width, 0.5);
-			if (cal.distance !== enddis * cal.width) { // 确实滑动了
-				switchItemBody(tempDis > 0, enddis, cal);
-			}
-			cal.distance = enddis * cal.width;
-			checkRange(cal.currentYear, cal.currentMonth, cal);
+			cal.move.X = cal.move.Y = cal.move.S = cal.move.standardS = 0;
+			cal.move.isFirst = true;
 		}
 	}
 	
@@ -270,6 +272,7 @@
 	function Calendar(config) {
 		this.clickTarget     = config.clickTarget || '';
 		this.container       = config.container;
+		this.angle           = config.angle || 0;
 		this.isMask          = config.isMask;
 		this.beginTime       = config.beginTime;
 		this.endTime         = config.endTime;
@@ -308,9 +311,9 @@
 			Y: 0,
 			increaseX: 0,
 			increaseY: 0,
-			count: 0,
+			isFirst: true,
 			S: 0,
-			standard: 0.26795, // tan15
+			standard: Math.tan(this.angle / 180 * Math.PI),
 			standardS: 0
 		};
 		this.end   = {
@@ -416,24 +419,24 @@
 					infinitePosition(_this);
 					setTimeout(function () {
 						_this.distance = _this.distance + _this.width;
-						transformFormat(_this.box, _this.distance,.3);
+						transformFormat(_this.box, _this.distance, .3);
 						switchItemBody(true, _this.distance / _this.width, _this);
 						checkRange(_this.currentYear, _this.currentMonth, _this);
-					},100);
+					}, 100);
 					
 				});
 				on('touchstart', _this.container + 'CalendarTitleRight', function () {
 					infinitePosition(_this);
 					setTimeout(function () {
 						_this.distance = _this.distance - _this.width;
-						transformFormat(_this.box, _this.distance,.3);
+						transformFormat(_this.box, _this.distance, .3);
 						switchItemBody(false, _this.distance / _this.width, _this);
 						checkRange(_this.currentYear, _this.currentMonth, _this);
-					},100);
+					}, 100);
 				});
 			}
 		},
-		renderCallbackArr: function(arr) {
+		renderCallbackArr: function (arr) {
 			var _this = this;
 			loop(0, arr.length, function (k) {
 				if (!$class(_this.container + '-item-' + arr[k].stamp)[0]) {
@@ -445,11 +448,11 @@
 				})
 			})
 		},
-		prevent: function	(e) {
+		prevent: function (e) {
 			e.preventDefault();
 		},
-		hideBackground: function(){
-			if(!this.isMask) return;
+		hideBackground: function () {
+			if (!this.isMask) return;
 			var _this = this;
 			var bg    = $id('calendar-bg-' + _this.container);
 			var block = $id('calendar-block-' + _this.container);
