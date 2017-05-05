@@ -60,7 +60,7 @@ $dateHeight : 40px;
   }
 }
 
-.calendar-block-action-none {
+.calendar-block.calendar-block-action-none {
   touch-action: none;
 }
 
@@ -89,6 +89,7 @@ $dateHeight : 40px;
   span {
     position: absolute;
     display: inline-block;
+    padding: 0 30px;
     height: $titleHeight;
     line-height: $titleHeight;
     font-family: 'iconfont';
@@ -96,10 +97,10 @@ $dateHeight : 40px;
     font-size: 16px;
   }
   .calendar-title-left {
-    left: 30px;
+    left: 0;
   }
   .calendar-title-right {
-    right: 30px;
+    right: 0;
   }
   b {
     font-size: 18px;

@@ -90,7 +90,7 @@
 	new Calendar({
 		// 用户传入实际的数据
 		container: 'container2',
-		angle: 8,
+		angle: 14,
 		isMask: false, // 是否需要弹层
 		beginTime: [2018, 1, 1],//如空数组默认设置成1970年1月1日开始,数组的每一位分别是年月日。
 		endTime: [2018, 1, 13],//如空数组默认设置成次年12月31日,数组的每一位分别是年月日。
@@ -107,12 +107,13 @@
 		}],
 		success: function (item, arr) {
 			console.log(item, arr);
+			document.getElementsByClassName('container2-item-' + item)[0].classList.add('able2');
 		},
 		switchRender: function (year, month, cal) {
 			console.log('计算机识别的 - 年份: ' + year + ' 月份: ' + month);
 			var data = [{
 				'stamp': 1507737600000,
-				'className': 'able1',
+				'className': 'able2',
 			}];
 			cal.renderCallbackArr(data);
 		}

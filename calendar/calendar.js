@@ -224,34 +224,32 @@
 		cal.end.X    = event.changedTouches[0].clientX;
 		cal.end.time = new Date().getTime();
 		var tempDis  = (cal.end.X - cal.start.X).toFixed(2);
-		if (Math.abs(cal.move.S) >= Math.abs(cal.move.standardS) && !cal.isMask) {
-		} else {
-			if (cal.end.time - cal.start.time < 100 && Math.abs(tempDis) < 5) {
-				if (event.target.matches('li') && event.target.className !== 'disabled' || event.target.matches('i') && event.target.parentNode.className !== 'disabled') {
-					var dataStamp = event.target.getAttribute('data-stamp');
-					if (cal.resultArr.length === 0) cal.resultArr.push(dataStamp);
-					else if (cal.resultArr.length === 1) cal.resultArr[0] < dataStamp ? cal.resultArr.push(dataStamp) : cal.resultArr.unshift(dataStamp);
-					else {
-						cal.resultArr.length = 0;
-						cal.resultArr.push(dataStamp);
-					}
-					cal.success(dataStamp, cal.resultArr, cal);
+		if (cal.end.time - cal.start.time < 100 && Math.abs(tempDis) < 5) {
+			if (event.target.matches('li') && event.target.className !== 'disabled' || event.target.matches('i') && event.target.parentNode.className !== 'disabled') {
+				var dataStamp = event.target.getAttribute('data-stamp');
+				if (cal.resultArr.length === 0) cal.resultArr.push(dataStamp);
+				else if (cal.resultArr.length === 1) cal.resultArr[0] < dataStamp ? cal.resultArr.push(dataStamp) : cal.resultArr.unshift(dataStamp);
+				else {
+					cal.resultArr.length = 0;
+					cal.resultArr.push(dataStamp);
 				}
-				transformFormat(cal.box, cal.distance, 0.5);
-			} else if (!cal.isRangeChecked) {
-				var enddis = cal.distance + (tempDis - 0);
-				enddis     = (cal.end.X * 2 >= cal.width && Math.abs(tempDis) * 5 >= cal.width) ?
-					Math.ceil(enddis / cal.width) : Math.floor(enddis / cal.width);
-				transformFormat(cal.box, enddis * cal.width, 0.5);
-				if (cal.distance !== enddis * cal.width) { // 确实滑动了
-					switchItemBody(tempDis > 0, enddis, cal);
-				}
-				cal.distance = enddis * cal.width;
-				checkRange(cal.currentYear, cal.currentMonth, cal);
+				cal.success(dataStamp, cal.resultArr, cal);
 			}
-			cal.move.X = cal.move.Y = cal.move.S = cal.move.standardS = 0;
-			cal.move.isFirst = true;
+			transformFormat(cal.box, cal.distance, 0.5);
+		} else if (Math.abs(cal.move.S) >= Math.abs(cal.move.standardS) && !cal.isMask) {
+		} else if (!cal.isRangeChecked) {
+			var enddis = cal.distance + (tempDis - 0);
+			enddis     = (cal.end.X * 2 >= cal.width && Math.abs(tempDis) * 5 >= cal.width) ?
+				Math.ceil(enddis / cal.width) : Math.floor(enddis / cal.width);
+			transformFormat(cal.box, enddis * cal.width, 0.5);
+			if (cal.distance !== enddis * cal.width) { // 确实滑动了
+				switchItemBody(tempDis > 0, enddis, cal);
+			}
+			cal.distance = enddis * cal.width;
+			checkRange(cal.currentYear, cal.currentMonth, cal);
 		}
+		cal.move.X = cal.move.Y = cal.move.S = cal.move.standardS = 0;
+		cal.move.isFirst = true;
 	}
 	
 	function touch(event, cal) {
