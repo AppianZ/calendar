@@ -250,6 +250,7 @@
 		}
 		cal.move.X = cal.move.Y = cal.move.S = cal.move.standardS = 0;
 		cal.move.isFirst = true;
+		doc.body.removeEventListener('touchmove', cal.prevent, true); // 防止乱滑
 	}
 	
 	function touch(event, cal) {
@@ -270,7 +271,7 @@
 	function Calendar(config) {
 		this.clickTarget     = config.clickTarget || '';
 		this.container       = config.container;
-		this.angle           = config.angle || 0;
+		this.angle           = config.angle || 14;
 		this.isMask          = config.isMask;
 		this.beginTime       = config.beginTime;
 		this.endTime         = config.endTime;
@@ -281,7 +282,7 @@
 		this.isChinese       = config.isChinese;
 		this.monthType       = config.monthType;
 		this.canViewDisabled = config.canViewDisabled;
-		this.beforeRenderArr = config.beforeRenderArr;
+		this.beforeRenderArr = config.beforeRenderArr || [];
 		this.success         = config.success;
 		this.switchRender    = config.switchRender;
 		
