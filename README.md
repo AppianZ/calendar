@@ -6,16 +6,21 @@ The Calendar was builded by **protogenic JavaScript**. So you can use it with jQ
 
 >  中文文档在后面~
 
-![gif0.](https://github.com/AppianZ/calendar/blob/master/calendar.gif) 
+![gif0.](https://ohovav7hg.qnssl.com/calendar1.gif) 
 
 
 ## Special Feature
 
 - [x] User-defined time ranges. You can set any date with the precision of a date
+
 - [x] Two kinds of layout --  “Popup Layout” & “Normal Layout” 
+
 - [x] User-defined “Chinese or English,  "the Sequence of Sunday" and "Switch button display"
+
 - [x] Controll the style of every day
+
 - [x] Choose "a time point" or "a time range"
+
 - [x] Controll the sensibility of user touches
 
 Look at a demo：⬇️⬇️⬇️
