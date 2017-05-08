@@ -1,5 +1,4 @@
 # Calendar - A  Flexible Calendar for Mobile
-
 ## **Intro**
 Calendar was born for `several product requirements` in the mobile.  It’s free, cute and customized.  
 
@@ -11,6 +10,7 @@ The Calendar was builded by **protogenic JavaScript**. So you can use it with jQ
 
 
 ## Special Feature
+
 - [x] User-defined time ranges. You can set any date with the precision of a date
 - [x] Two kinds of layout --  “Popup Layout” & “Normal Layout” 
 - [x] User-defined “Chinese or English,  "the Sequence of Sunday" and "Switch button display"
@@ -25,6 +25,7 @@ Look at a demo：⬇️⬇️⬇️
 * [Calendar NPM]()
 
 ## How To Use
+**1. html中：**
 ```html
 <body>
     <!-- You'll need  it in "Popup Layout".  The #target can be any other dom for your convenient-->
@@ -34,6 +35,7 @@ Look at a demo：⬇️⬇️⬇️
 </body>
 ```
 
+**2. js中：**
 ```js
 <script src="calendar.js"></script>
 <script> 
@@ -93,6 +95,7 @@ How to generate a new instance，look at the arguments list：⬇️⬇️⬇️
 |success| the callback of  tap events|   {Fuction(item, array,cal)} there are 3 arguments，`item`: the time stamp of the target，`array` :the two targets after two tap events ,`cal` : the instance| √ |
 |switchRender| the callback of  switch events |   {Fuction(year, month, cal)} there are 3 arguments，`year` : the generating year，`month`: the generating month (from zero), `cal` : the instance| √ |
 
+**js中：**
 ```js
 // the JSON example of the beforeRenderArr
 beforeRenderArr: [{
@@ -101,6 +104,7 @@ beforeRenderArr: [{
 }]
 ```
 
+**html中：**
 ```html
 <!--  'li'  is a rectangle，'i'  is a circular -->
 <li class="container-item-1512057600000 disable" data-stamp="1512057600000">
@@ -118,7 +122,6 @@ beforeRenderArr: [{
 ### 2017.5.8(add)
 > * New Project -- Calendar,  First Publish .
 
-
 ## **Authors**
 >  For questions and issues please use  [THIS WAY](https://github.com/AppianZ/calendar/issues/new)
 
@@ -134,6 +137,7 @@ Calendar是为了满足移动端对`各种场景`的需求而生的，兼容性�
 原生插件，可以与任何框架配合使用。
 
 ## 特色功能
+
 - [x] 限制时间范围，精确到【日期】
 - [x] 有【直接布局】和【弹层显示】两种不同调用样式
 - [x] 自由设置【月份和星期的中英文显示】、【星期天的排序位置】和【切换操作】
@@ -148,7 +152,7 @@ Calendar是为了满足移动端对`各种场景`的需求而生的，兼容性�
 * [Calendar NPM]()
 
 ## How To Use
-
+**1. html中：**
 ```html
 <body>
     <!-- 在弹层模式中会需要一个元素触发弹层，target 可以是任意html标签。-->
@@ -158,6 +162,7 @@ Calendar是为了满足移动端对`各种场景`的需求而生的，兼容性�
 </body>
 ```
 
+**2. js中：**
 ```js
 <script src="calendar.js"></script>
 <script> 
@@ -219,6 +224,7 @@ Calendar是为了满足移动端对`各种场景`的需求而生的，兼容性�
 |success| 点击某个日期的回调 |   {Fuction(item, array,cal)} 返回3个自带参数，`item`表示当前点击的时间戳，`array`表示连续两次点击的两个时间戳,`cal` 指向实例| √ |
 |switchRender| 日历切换后的回调 |   {Fuction(year, month, cal)} 返回3个自带参数，`year`表示新生成的年份，`month`表示新生成的月份(从0开始), `cal` 指向实例| √ |
 
+**js中：**
 ```js
 // 渲染时给特殊日期指定样式的数据格式
 beforeRenderArr: [{
@@ -227,6 +233,7 @@ beforeRenderArr: [{
 }]
 ```
 
+**html中：**
 ```html
 // 渲染后的效果如下
 // li 是一个矩形，i 是圆形
