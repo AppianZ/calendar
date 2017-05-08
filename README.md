@@ -20,9 +20,8 @@ The Calendar was builded by **protogenic JavaScript**. So you can use it with jQ
 
 Look at a demo：⬇️⬇️⬇️
 
-## Demo & NPM
-* [Calendar Demo]()
-* [Calendar NPM]()
+## Demo
+* [Calendar Demo](https://appianz.github.io/calendar/index.html)
 
 ## How To Use
 **1. html中：**
@@ -147,9 +146,9 @@ Calendar是为了满足移动端对`各种场景`的需求而生的，兼容性�
 
 亲自体验一下demo：⬇️⬇️⬇️
 
-## **Demo & NPM**
-* [Calendar Demo]()
-* [Calendar NPM]()
+## **Demo**
+* [Calendar Demo](https://appianz.github.io/calendar/index.html)
+
 
 ## How To Use
 **1. html中：**
