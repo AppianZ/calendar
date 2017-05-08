@@ -132,13 +132,13 @@
 		var tempStamp = '';
 		loop(0, dateArr.length, function (i) {
 			if (/b$/.test(dateArr[i])) {
-				html += '<li class="disabled"><i>' + dateArr[i].replace('b', '') + '</i></li>';
+				html += '<li class="calendar-disabled"><i>' + dateArr[i].replace('b', '') + '</i></li>';
 			} else if (/a$/.test(dateArr[i])) {
-				html += '<li class="disabled"><i>' + dateArr[i].replace('a', '') + '</i></li>';
+				html += '<li class="calendar-disabled"><i>' + dateArr[i].replace('a', '') + '</i></li>';
 			} else {
 				tempStamp = new Date(year, month, dateArr[i]).getTime();
 				html += '<li' + (tempStamp >= cal.beginStamp && tempStamp <= cal.endStamp ?
-					' class="' + cal.container + '-item-' + tempStamp + '" data-stamp="' + tempStamp + '"' : ' class="disabled"') +
+					' class="' + cal.container + '-item-' + tempStamp + '" data-stamp="' + tempStamp + '"' : ' class="calendar-disabled"') +
 					'><i data-stamp="' + tempStamp + '">' + dateArr[i] + '</i></li>';
 			}
 		});
@@ -225,7 +225,7 @@
 		cal.end.time = new Date().getTime();
 		var tempDis  = (cal.end.X - cal.start.X).toFixed(2);
 		if (cal.end.time - cal.start.time < 100 && Math.abs(tempDis) < 5) {
-			if (event.target.matches('li') && event.target.className !== 'disabled' || event.target.matches('i') && event.target.parentNode.className !== 'disabled') {
+			if (event.target.matches('li') && event.target.className !== 'calendar-disabled' || event.target.matches('i') && event.target.parentNode.className !== 'calendar-disabled') {
 				var dataStamp = event.target.getAttribute('data-stamp');
 				if (cal.resultArr.length === 0) cal.resultArr.push(dataStamp);
 				else if (cal.resultArr.length === 1) cal.resultArr[0] < dataStamp ? cal.resultArr.push(dataStamp) : cal.resultArr.unshift(dataStamp);
