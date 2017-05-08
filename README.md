@@ -75,24 +75,24 @@ How to generate a new instance，look at the arguments list：⬇️⬇️⬇️
 
 ## Arguments List
 
-|Name|Mean|Value|Must|
-|:---:|:---:|:---:|:---:|
-|clickTarget | the id of the dom you touch | {String} | × |
-|container| the id of the container you ready to append dom| {String} | √ |
-|angle| fix the sensibility of user touches by angle | {Number}  had better set it between  **5** and **20** | × |
-|isMask| set layout | {Boolean}  true:“**popup layout**”, false:“**normal layout**”  | √ |
-|beginTime| user-defined begin time points.  | {Array(Number)} an empty array means` [1970, 1, 1]`. every position sequent meas “**year**”, "**month**" and "**date**".  | √ |
-|endTime| user-defined end time points. | {Array(Number)} the same to beginTime. an empty array means `[nextYear, 12, 31] `| √ |
-|recentTime| user-defined current time points. | {Array(Number)}  the same to beginTime. an empty array means `[currentYear, currentMonth, 1]`  | √ |
-|isSundayFirst| the Sequence of Sunday | {Boolean} true:Sunday at the **first** column, false:Sunday at the **last** column | √ |
-|isShowNeighbor| controll the display of the adjacent months| {Boolean} true: show the adjacent months, false: hide the adjacent months | √ |
-|isToggleBtn| controll the display of the switch button| {Boolean} true:show the switch button, false:hide the switch button| √ |
-|isChinese| controll the language of week |  {Boolean} true:show Chinese week like ‘六’，false: show English week like ‘S’ | √ |
-|monthType| controll the type of month  | {Number 0-3} 0: 1月, 1:一月, 2:Jan, 3: January | √ |
-|canViewDisabled| controll the display of the out-range months |  {Boolean} true: show the out-range months，false:hide the out-range months| √ |
-|beforeRenderArr| rend the style of the specified date |   {unordered Array(Object)} every item of this array has two arguments:  the specified date  `stamp{Number}` & the specified classname `className {String}`, see below for details | √ |
-|success| the callback of  tap events|   {Fuction(item, array,cal)} there are 3 arguments，`item`: the time stamp of the target，`array` :the two targets after two tap events ,`cal` : the instance| √ |
-|switchRender| the callback of  switch events |   {Fuction(year, month, cal)} there are 3 arguments，`year` : the generating year，`month`: the generating month (from zero), `cal` : the instance| √ |
+|Name|Mean|Type|Value|Must|
+|:---:|:---:|:---:|:---:|:---:|
+|clickTarget | the id of the dom you touch | {String}| - | × |
+|container| the id of the container you ready to append dom| {String}| - | √ |
+|angle| fix the sensibility of user touches by angle | {Number}|  had better set it between  **5** and **20** | × |
+|isMask| set layout | {Boolean} | true:“**popup layout**”, false:“**normal layout**”  | √ |
+|beginTime| user-defined begin time points.  | {Array(Number)} |an empty array means` [1970, 1, 1]`. every position sequent meas “**year**”, "**month**" and "**date**".  | √ |
+|endTime| user-defined end time points. | {Array(Number)}| the same to beginTime. an empty array means `[nextYear, 12, 31] `| √ |
+|recentTime| user-defined current time points. | {Array(Number)} | the same to beginTime. an empty array means `[currentYear, currentMonth, 1]`  | √ |
+|isSundayFirst| the Sequence of Sunday | {Boolean}| true:Sunday at the **first** column, false:Sunday at the **last** column | √ |
+|isShowNeighbor| controll the display of the adjacent months| {Boolean} |true: show the adjacent months, false: hide the adjacent months | √ |
+|isToggleBtn| controll the display of the switch button| {Boolean}| true:show the switch button, false:hide the switch button| √ |
+|isChinese| controll the language of week |  {Boolean} |true:show Chinese week like ‘六’，false: show English week like ‘S’ | √ |
+|monthType| controll the type of month  | {Number 0-3}| 0: 1月, 1:一月, 2:Jan, 3: January | √ |
+|canViewDisabled| controll the display of the out-range months |  {Boolean} |true: show the out-range months，false:hide the out-range months| √ |
+|beforeRenderArr| rend the style of the specified date |   {unordered Array(Object)} | every item of this array has two arguments:  the specified date  `stamp{Number}` & the specified classname `className {String}`, see below for details | √ |
+|success| the callback of  tap events|   {Fuction(item, array,cal)}| there are 3 arguments，`item`: the time stamp of the target，`array` :the two targets after two tap events ,`cal` : the instance| √ |
+|switchRender| the callback of  switch events |   {Fuction(year, month, cal)} |  there are 3 arguments，`year` : the generating year，`month`: the generating month (from zero), `cal` : the instance| √ |
 
 **js中：**
 ```js
@@ -204,24 +204,24 @@ Calendar是为了满足移动端对`各种场景`的需求而生的，兼容性�
 
 ## 参数列表
 
-|参数名称|作用|取值|是否必须|
-|:---:|:---:|:---:|:---:|
-|clickTarget| 触发弹层的dom元素ID| {String} | × |
-|container| 日历容器的dom元素ID| {String} | √ |
-|angle| 调整预判手势的灵敏度 | {Number}  建议5-20 | × |
-|isMask| 布局是否使用弹层样式 | {Boolean}  true:弹层显示, false:正常布局  | √ |
-|beginTime|开始时间点| {Array(Number)} 数组的每一位分别是年月日，空数组默认1970年1月1日 | √ |
-|endTime|结束时间点 | {Array(Number)} 数组的每一位分别是年月日，空数组默认次年12月31日 | √ |
-|recentTime| 当前时间点 | {Array(Number)} 数组的每一位分别是年月日，空数组默认当前月1日 | √ |
-|isSundayFirst| 星期天是否要放在第一列 | {Boolean} true:星期日在第一列, false:星期日在最后一列 | √ |
-|isShowNeighbor| 是否展示相邻月份的月尾和月头 | {Boolean} true:显示相邻月份的月尾和月头, false:不显示 | √ |
-|isToggleBtn| 是否展示左右切换按钮 | {Boolean} true:显示左右切换按钮， false:不显示| √ |
-|isChinese| 是否展示中文星期 |  {Boolean} true:显示中文星期简写，false:显示英文星期简写 | √ |
-|monthType| 月份的展示字符 | {Number 0-3} 0:1月, 1:一月, 2:Jan, 3: January | √ |
-|canViewDisabled| 是否可以阅读不在范围内的月份 |  {Boolean} true:无限滑动，false:只查看时间范围内的月份| √ |
-|beforeRenderArr| 初次渲染时给特殊日期指定样式 |   {无序Array(Object)} 数组元素有两个参数 `指定时间戳stamp{Number}` 和 `指定样式名字className {String}`，详见下文| √ |
-|success| 点击某个日期的回调 |   {Fuction(item, array,cal)} 返回3个自带参数，`item`表示当前点击的时间戳，`array`表示连续两次点击的两个时间戳,`cal` 指向实例| √ |
-|switchRender| 日历切换后的回调 |   {Fuction(year, month, cal)} 返回3个自带参数，`year`表示新生成的年份，`month`表示新生成的月份(从0开始), `cal` 指向实例| √ |
+|参数名称|作用|类型|取值|是否必须|
+|:---:|:---:|:---:|:---:|:---:|
+|clickTarget| 触发弹层的dom元素ID| {String} | - | × |
+|container| 日历容器的dom元素ID| {String} | - |√ |
+|angle| 调整预判手势的灵敏度 | {Number} | 建议5-20 | × |
+|isMask| 布局是否使用弹层样式 | {Boolean} | true:弹层显示, false:正常布局  | √ |
+|beginTime|开始时间点| {Array(Number)} |数组的每一位分别是年月日，空数组默认1970年1月1日 | √ |
+|endTime|结束时间点 | {Array(Number)} |数组的每一位分别是年月日，空数组默认次年12月31日 | √ |
+|recentTime| 当前时间点 | {Array(Number)} |数组的每一位分别是年月日，空数组默认当前月1日 | √ |
+|isSundayFirst| 星期天是否要放在第一列 | {Boolean} |true:星期日在第一列, false:星期日在最后一列 | √ |
+|isShowNeighbor| 是否展示相邻月份的月尾和月头 | {Boolean} |true:显示相邻月份的月尾和月头, false:不显示 | √ |
+|isToggleBtn| 是否展示左右切换按钮 | {Boolean}| true:显示左右切换按钮， false:不显示| √ |
+|isChinese| 是否展示中文星期 |  {Boolean} |true:显示中文星期简写，false:显示英文星期简写 | √ |
+|monthType| 月份的展示字符 | {Number 0-3} |0:1月, 1:一月, 2:Jan, 3: January | √ |
+|canViewDisabled| 是否可以阅读不在范围内的月份 |  {Boolean}| true:无限滑动，false:只查看时间范围内的月份| √ |
+|beforeRenderArr| 初次渲染时给特殊日期指定样式 |   {无序Array(Object)}| 数组元素有两个参数 `指定时间戳stamp{Number}` 和 `指定样式名字className {String}`，详见下文| √ |
+|success| 点击某个日期的回调 |   {Fuction(item, array,cal)} |返回3个自带参数，`item`表示当前点击的时间戳，`array`表示连续两次点击的两个时间戳,`cal` 指向实例| √ |
+|switchRender| 日历切换后的回调 |   {Fuction(year, month, cal)} |返回3个自带参数，`year`表示新生成的年份，`month`表示新生成的月份(从0开始), `cal` 指向实例| √ |
 
 **js中：**
 ```js
