@@ -7,7 +7,7 @@
 	<meta name="format-detection" content="telephone=no"/>
 	<meta name="screen-orientation" content="portrait">
 	<title>calendar</title>
-	<link rel="stylesheet" href="calendar.css">
+	<link rel="stylesheet" href="./calendar/calendar.css">
 	<style>
 		body {
 			height: 100%;
@@ -35,11 +35,12 @@
 		}
 
 		.able1 {
-			background: red;
+			background: #509F9B;
 		}
 
-		.able2 {
-			background: rgba(255, 0, 255, .8);
+		.able2 i{
+			color: #fff;
+			background: linear-gradient(120deg,#ff3c3c, #ff9ca1);
 		}
 	</style>
 </head>
@@ -51,7 +52,7 @@
 <div id="container2"></div>
 <article style="background: #abcdef; height: 500px"></article>
 
-<script src="calendar.js"></script>
+<script src="./calendar/calendar.js"></script>
 <script>
 	new Calendar({
 		// 用户传入实际的数据
