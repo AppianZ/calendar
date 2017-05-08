@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta id="viewport" name="viewport"
+				content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta name="format-detection" content="telephone=no"/>
+	<meta name="screen-orientation" content="portrait">
+	<title>calendar</title>
+	<link rel="stylesheet" href="calendar.css">
+	<style>
+		body {
+			height: 100%;
+			background: #fff;
+		}
+		#target {
+			width: 100%;
+			height: 60px;
+			background: #FF5C6F;
+			text-align: center;
+			line-height: 60px;
+			color: #fff;
+		}
+
+		.calendar-item0 {
+			background: #85D64D;
+		}
+
+		.calendar-item1 {
+			background: #abcdef;
+		}
+
+		.calendar-item2 {
+			background: #FF8877
+		}
+
+		.able1 {
+			background: red;
+		}
+
+		.able2 {
+			background: rgba(255, 0, 255, .8);
+		}
+	</style>
+</head>
+<body>
+<div id="target">我是一个点击区域,大家快来点我</div>
+
+<div id="container"></div>
+
+<div id="container2"></div>
+<article style="background: #abcdef; height: 500px"></article>
+
+<script src="calendar.js"></script>
+<script>
+	new Calendar({
+		// 用户传入实际的数据
+		clickTarget: 'target',
+		container: 'container',
+		angle: 0,
+		isMask: true, // 是否需要弹层
+		beginTime: [2017, 1, 1],//如空数组默认设置成1970年1月1日开始,数组的每一位分别是年月日。
+		endTime: [2018, 1, 13],//如空数组默认设置成次年12月31日,数组的每一位分别是年月日。
+		recentTime: [2018, 1, 2],//如空数组默认设置成当月1日,数组的每一位分别是年月日。
+		isSundayFirst: true, // 周日是否要放在第一列
+		isShowNeighbor: true, // 是否展示相邻月份的月尾和月头
+		isToggleBtn: true, // 是否展示左右切换按钮
+		isChinese: true, // 是否是中文
+		monthType: 3, // 0:1月, 1:一月, 2:Jan, 3: April
+		canViewDisabled: false, // 是否可以阅读不在范围内的月份
+		beforeRenderArr: [{
+			stamp: 1512057600000,
+			className: 'able1',
+		}],
+		success: function (item, arr, cal) {
+			console.log(item, arr);
+			cal.hideBackground();
+		},
+		switchRender: function (year, month, cal) {
+			console.log('计算机识别的 - 年份: ' + year + ' 月份: ' + month);
+			var data = [{
+				'stamp': 1507737600000,
+				'className': 'able1',
+			}];
+			cal.renderCallbackArr(data);
+		}
+	});
+
+
+	new Calendar({
+		// 用户传入实际的数据
+		container: 'container2',
+		angle: 14,
+		isMask: false, // 是否需要弹层
+		beginTime: [2018, 1, 1],//如空数组默认设置成1970年1月1日开始,数组的每一位分别是年月日。
+		endTime: [2018, 1, 13],//如空数组默认设置成次年12月31日,数组的每一位分别是年月日。
+		recentTime: [2018, 1, 2],//如空数组默认设置成当月1日,数组的每一位分别是年月日。
+		isSundayFirst: true, // 周日是否要放在第一列
+		isShowNeighbor: true, // 是否展示相邻月份的月尾和月头
+		isToggleBtn: true, // 是否展示左右切换按钮
+		isChinese: true, // 是否是中文
+		monthType: 0, // 0:1月, 1:一月, 2:Jan, 3: April
+		canViewDisabled: true, // 是否可以阅读不在范围内的月份
+		beforeRenderArr: [{
+			stamp: 1514822400000,
+			className: 'able2',
+		}],
+		success: function (item, arr) {
+			console.log(item, arr);
+			document.getElementsByClassName('container2-item-' + item)[0].classList.add('able2');
+		},
+		switchRender: function (year, month, cal) {
+			console.log('计算机识别的 - 年份: ' + year + ' 月份: ' + month);
+			var data = [{
+				'stamp': 1507737600000,
+				'className': 'able2',
+			}];
+			cal.renderCallbackArr(data);
+		}
+	});
+</script>
+</body>
+</html>
