@@ -20,8 +20,9 @@ The Calendar was builded by **protogenic JavaScript**. So you can use it with jQ
 
 Look at a demo：⬇️⬇️⬇️
 
-## Demo
+## Demo & NPM
 * [Calendar Demo](https://appianz.github.io/calendar/index.html)
+* [Calendar NPM](https://www.npmjs.com/package/mob-calendar)
 
 ## How To Use
 **1. html中：**
@@ -36,7 +37,14 @@ Look at a demo：⬇️⬇️⬇️
 
 **2. js中：**
 ```js
+// mode 1
 <script src="calendar.js"></script>
+// mode 2
+import Calendar from 'mob-calendar';
+```
+
+
+```js
 <script> 
     new Calendar({
 		clickTarget: 'target',
@@ -146,9 +154,9 @@ Calendar是为了满足移动端对`各种场景`的需求而生的，兼容性�
 
 亲自体验一下demo：⬇️⬇️⬇️
 
-## **Demo**
+## Demo & NPM
 * [Calendar Demo](https://appianz.github.io/calendar/index.html)
-
+* [Calendar NPM](https://www.npmjs.com/package/mob-calendar)
 
 ## How To Use
 **1. html中：**
@@ -163,9 +171,16 @@ Calendar是为了满足移动端对`各种场景`的需求而生的，兼容性�
 
 **2. js中：**
 ```js
+// 方式一, 直接引用
 <script src="calendar.js"></script>
+// 方式二, 引入npm包
+import Calendar from 'mob-calendar';
+```
+
+
+```js
 <script> 
-    // 实例化一个日历插件，具体参数意义可以看下文中的参数列表
+	// 实例化一个日历插件，具体参数意义可以看下文中的参数列表
     new Calendar({
 		clickTarget: 'target',
 		container: 'container',
