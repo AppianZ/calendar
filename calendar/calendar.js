@@ -224,7 +224,7 @@
 		cal.end.X    = event.changedTouches[0].clientX;
 		cal.end.time = new Date().getTime();
 		var tempDis  = (cal.end.X - cal.start.X).toFixed(2);
-		if (cal.end.time - cal.start.time < 100 && Math.abs(tempDis) < 5) {
+		if (cal.end.time - cal.start.time < 200 && Math.abs(tempDis) < 10) {
 			if (event.target.matches('li') && event.target.className !== 'calendar-disabled' || event.target.matches('i') && event.target.parentNode.className !== 'calendar-disabled') {
 				var dataStamp = event.target.getAttribute('data-stamp');
 				if (cal.resultArr.length === 0) cal.resultArr.push(dataStamp);
