@@ -121,8 +121,6 @@
 			if (cal.isShowNeighbor) recentArr.push(i + 'a');
 			else recentArr.push('' + 'a');
 		});
-		/*console.log(' =====' + year + '年 ' + month + '月=====  ');
-		 console.log(recentArr);*/
 		return recentArr;
 	}
 	
@@ -173,7 +171,7 @@
 			obj.setAttribute('data-month', applyMonth + 1);
 		});
 		
-		cal.switchRender(applyYear, applyMonth, cal); // 获得回调后的数组,并执行操作
+		cal.switchRender(applyYear, applyMonth, cal);
 	}
 	
 	function touchStart(event, cal) {
@@ -199,7 +197,7 @@
 			doc.body.removeEventListener('touchmove', cal.prevent, true);
 			transformFormat(cal.box, cal.distance, .3);
 		} else {
-			doc.body.addEventListener('touchmove', cal.prevent, true); // 防止乱滑
+			doc.body.addEventListener('touchmove', cal.prevent, true);
 			if (cal.canViewDisabled) {
 				cal.isRangeChecked = false;
 				var movedis        = cal.distance + (offset - 0);
@@ -242,7 +240,7 @@
 			enddis     = (cal.end.X * 2 >= cal.width && Math.abs(tempDis) * 5 >= cal.width) ?
 				Math.ceil(enddis / cal.width) : Math.floor(enddis / cal.width);
 			transformFormat(cal.box, enddis * cal.width, 0.5);
-			if (cal.distance !== enddis * cal.width) { // 确实滑动了
+			if (cal.distance !== enddis * cal.width) {
 				switchItemBody(tempDis > 0, enddis, cal);
 			}
 			cal.distance = enddis * cal.width;
@@ -250,7 +248,7 @@
 		}
 		cal.move.X = cal.move.Y = cal.move.S = cal.move.standardS = 0;
 		cal.move.isFirst = true;
-		doc.body.removeEventListener('touchmove', cal.prevent, true); // 防止乱滑
+		doc.body.removeEventListener('touchmove', cal.prevent, true);
 	}
 	
 	function touch(event, cal) {
@@ -391,7 +389,7 @@
 					bg.classList.add('calendar-bg-up', 'calendar-bg-delay');
 					block.classList.add('calendar-block-mask-up', 'calendar-block-mask-transition', 'calendar-block-action-none');
 					body.classList.add('calendar-locked');
-					body.addEventListener('touchmove', _this.prevent); // 防止乱滑
+					body.addEventListener('touchmove', _this.prevent);
 				}, false);
 				
 				on('touchstart', 'calendar-bg-' + _this.container, function () {
@@ -399,7 +397,7 @@
 					block.classList.remove('calendar-block-mask-up', 'calendar-block-action-none');
 					body.classList.remove('calendar-locked');
 					setTimeout(function () {
-						bg.classList.remove('calendar-bg-delay'); // 防止点透
+						bg.classList.remove('calendar-bg-delay');
 					}, 300);
 					body.removeEventListener('touchmove', _this.prevent);
 				}, false);
@@ -460,7 +458,7 @@
 			block.classList.remove('calendar-block-mask-up', 'calendar-block-action-none');
 			body.classList.remove('calendar-locked');
 			setTimeout(function () {
-				bg.classList.remove('calendar-bg-delay'); // 防止点透
+				bg.classList.remove('calendar-bg-delay');
 			}, 300);
 			body.removeEventListener('touchmove', _this.prevent);
 		}
