@@ -268,5 +268,7 @@ beforeRenderArr: [{
 
 ## **Authors**
 >  如果你遇到了什么神bug，请发起[ISSUE](https://github.com/AppianZ/calendar/issues/new)联系我 ~
-
+>
+>  很快,我会就日历的开发过程写一篇详细解说,尽请期待
+>
 >  我是嘉宝Appian，一个卖萌出家的算法妹纸。
