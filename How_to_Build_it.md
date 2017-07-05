@@ -2,7 +2,7 @@
 
 在阅读本文之前，确保你有稍微看过[ calendar 的效果 ](https://github.com/AppianZ/calendar)喔~
 
-![gif0.](./calendar1.gif) 
+![gif0.](https://ohovav7hg.qnssl.com/calendar1.gif) 
  
 * [ 点击查看github， 查看calendar源码 ](https://github.com/AppianZ/calendar)
 * 
