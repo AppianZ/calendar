@@ -289,7 +289,7 @@
 		this.currentYear  = new Date().getFullYear();
 		this.currentMonth = new Date().getMonth();
 		
-		this.width    = doc.body.offsetWidth;
+		this.width    = $id(this.container).offsetWidth;
 		this.distance = 0;
 		
 		this.beginStamp     = 0;
